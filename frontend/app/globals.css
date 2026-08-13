@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --font-fredoka: 'Fredoka', sans-serif;
+  --font-nunito: 'Nunito', sans-serif;
+}
+
+body {
+  font-family: var(--font-nunito);
+  color: #4b4b4b;
+  background-color: #ffffff;
+  overflow-x: hidden;
+}
+
+.dark body {
+  color: #f1f5f9;
+  background-color: #131f24;
+}
+
+/* Gamified 3D Button Depth FX */
+.btn-duo-green {
+  background-color: #58CC02;
+  box-shadow: 0 4px 0 0 #46A302;
+  color: #ffffff;
+}
+.btn-duo-green:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 #46A302;
+}
+
+.btn-duo-blue {
+  background-color: #1CB0F6;
+  box-shadow: 0 4px 0 0 #1899D6;
+  color: #ffffff;
+}
+.btn-duo-blue:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 #1899D6;
+}
+
+.btn-duo-yellow {
+  background-color: #FFC800;
+  box-shadow: 0 4px 0 0 #E5B200;
+  color: #4b4b4b;
+}
+.btn-duo-yellow:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 #E5B200;
+}
+
+.btn-duo-red {
+  background-color: #FF4B4B;
+  box-shadow: 0 4px 0 0 #EA2B2B;
+  color: #ffffff;
+}
+.btn-duo-red:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 #EA2B2B;
+}
+
+.btn-duo-purple {
+  background-color: #CE82FF;
+  box-shadow: 0 4px 0 0 #AF6CD9;
+  color: #ffffff;
+}
+.btn-duo-purple:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 #AF6CD9;
+}
+
+.btn-duo-white {
+  background-color: #ffffff;
+  border: 2px solid #e5e5e5;
+  box-shadow: 0 4px 0 0 #e5e5e5;
+  color: #4b4b4b;
+}
+.btn-duo-white:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 #e5e5e5;
+}
+
+/* Pulse animation for active lesson node */
+@keyframes nodePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(88, 204, 2, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(88, 204, 2, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(88, 204, 2, 0);
+  }
+}
+
+.active-node-pulse {
+  animation: nodePulse 2s infinite;
+}
