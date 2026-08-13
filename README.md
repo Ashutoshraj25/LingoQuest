@@ -1,118 +1,90 @@
-# LingoQuest - Gamified Language Learning Platform
+# LingoQuest - Deployment Ready Gamified Language Platform
 
-**LingoQuest** is a production-quality, full-stack language learning web application clone inspired by Duolingo. It features an interactive learning path, interactive exercise player (supporting 5 exercise types), real-time gamification mechanics (XP, daily streak counters, heart management, gem rewards), leaderboards, achievements showcase, daily goals, practice hub, statistics graphs, shop, and dark mode.
-
----
-
-## Technical Stack
-
-### Frontend
-- **Framework:** Next.js 15 (App Router) + React 19
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS + Custom 3D Depth Utilities
-- **Animations:** Framer Motion + Canvas Confetti
-- **Icons:** Lucide React Icons
-- **Data Visualization:** Recharts
-
-### Backend
-- **Framework:** Python FastAPI
-- **Database:** SQLite (ORM via SQLAlchemy 2.0)
-- **Validation:** Pydantic v2
-- **Data Seeding:** Seed script populating French & Spanish courses, 20+ exercises across all 5 types, leaderboard entries, achievements, daily quests, and shop items.
+**LingoQuest** is a production-ready, full-stack language learning web application clone inspired by Duolingo. It is built using Next.js 15, React 19, TypeScript, Tailwind CSS, Framer Motion, FastAPI, SQLAlchemy, and SQLite.
 
 ---
 
-## Project Folder Structure
+## 📋 Deployment Audit & Fixes Completed
 
-```
+- [x] **Configurable API Endpoint**: Removed hardcoded URLs; uses `process.env.NEXT_PUBLIC_API_URL`.
+- [x] **CORS & Environment Variables**: Configured CORS middleware in FastAPI to accept allowed origins from `ALLOWED_ORIGINS` environment variable.
+- [x] **Health Check Endpoint**: Added `GET /health` returning `{"status": "ok"}` for load balancers.
+- [x] **Error & Loading Boundaries**: Added `app/error.tsx` (Global Error), `app/not-found.tsx` (404 Page), and `app/loading.tsx` (Global Skeleton).
+- [x] **Database Initialization**: SQLite database (`sqlite:///./lingoquest.db`) automatically creates tables and seeds realistic Indian language courses if empty.
+- [x] **Deployment Specs**: Added `frontend/vercel.json`, `backend/render.yaml`, `backend/Dockerfile`, `.env.example`.
+
+---
+
+## 🛠️ Tech Stack & Folder Structure
+
+```text
 d:/scaler assigment/
 ├── backend/
 │   ├── app/
-│   │   ├── api/          # REST Endpoints (auth, dashboard, lessons, leaderboard, etc.)
-│   │   ├── crud/         # DB CRUD operations & progress calculation logic
-│   │   ├── database/     # SQLAlchemy SQLite session engine
-│   │   ├── models/       # Database ORM models (User, Course, Unit, Exercise, etc.)
-│   │   ├── schemas/      # Pydantic schemas for request/response validation
-│   │   ├── seed/         # Database seeding script (seed_data.py)
+│   │   ├── api/          # REST API endpoints (auth, dashboard, lessons, etc.)
+│   │   ├── database/     # SQLite SQLAlchemy engine (sqlite:///./lingoquest.db)
+│   │   ├── models/       # Database ORM models
+│   │   ├── schemas/      # Pydantic schemas
+│   │   ├── seed/         # Indian languages seed script (seed_data.py)
 │   │   └── main.py       # FastAPI application entry point
-│   └── requirements.txt
+│   ├── alembic/          # Alembic migrations directory
+│   ├── Dockerfile        # Docker container spec
+│   ├── render.yaml       # Render deployment spec
+│   ├── requirements.txt  # Python backend dependencies
+│   └── .env.example
 │
 ├── frontend/
-│   ├── app/              # Next.js 15 App router pages (dashboard, lesson player, practice, etc.)
-│   ├── components/       # Reusable UI primitives (Button, Card, ProgressBar, Mascot, Sidebar, Navbar)
+│   ├── app/              # Next.js 15 App Router pages, loading, error, not-found
+│   ├── components/       # Duolingo 3D depth components (Button, Card, Mascot, Navbar, Sidebar)
 │   ├── features/         # Domain components (learning-path, lesson-player, lesson-complete)
 │   ├── lib/              # API client service layer (api.ts)
-│   └── package.json
+│   ├── vercel.json       # Vercel deployment spec
+│   └── .env.example
 │
-└── README.md
+├── package.json          # Root monorepo script launcher
+└── .env.example          # Root environment variable template
 ```
 
 ---
 
-## Features & Supported Screens
+## 🔑 Environment Variables
 
-1. **Dashboard & Learning Path (`/`)**
-   - Unit Header Card banner (French Section 1)
-   - Interactive curved / zigzag Lesson Path Nodes with SVG Progress Rings, Crown icons, active pulse glow, and popover detail menus.
-   - Right sidebar displaying Daily Goal widget, Practice Hub card, and Gold League leaderboard preview.
+Copy `.env.example` to `.env`:
 
-2. **Interactive Lesson Player (`/lesson/[id]`)**
-   - Sequential exercise loop across 5 exercise types:
-     1. `Multiple Choice` (Grid option selection with translation hints)
-     2. `Word Bank` (Tap-to-select word chips to construct sentence)
-     3. `Match Pairs` (Two-column pair matching with visual feedback)
-     4. `Fill in the Blank` (Inline option selection into context sentence)
-     5. `Type Answer` (Free-form text answer validation)
-   - Progress bar, Hearts deduction on error, and sticky bottom Feedback Bar (Success / Error states).
-
-3. **Lesson Complete Screen**
-   - Canvas confetti celebration burst, Total XP earned counter, Accuracy percentage indicator, and Combo meter.
-
-4. **Practice Hub (`/practice`)**
-   - Practice modes: Weak Skills (+20 XP), Mistakes Review (+15 XP), Timed Challenge (+40 XP), Heart Refill Practice.
-
-5. **Leaderboard (`/leaderboard`)**
-   - Top 3 Podium (1st, 2nd, 3rd place with crowns & XP badges) + full Gold League rankings table highlighting current user.
-
-6. **Learner Profile (`/profile`)**
-   - Avatar header, Level & Join date, overview stats cards (Streak, XP, League, Hearts), Add Friend & Share buttons.
-
-7. **Gold Trophy Showcase (`/achievements`)**
-   - Achievement cards grid with category badges, progress bars, and claim gem reward buttons.
-
-8. **Your Statistics (`/statistics`)**
-   - Recharts Weekly XP activity bar chart, learning speed metrics, and GitHub-style daily activity heatmap grid.
-
-9. **LingoQuest Shop (`/shop`)**
-   - Gem packs, Heart Refills, Streak Freeze, 2x XP Double Boost, and LingoQuest Plus subscription card.
-
-10. **Daily Goals & Quests (`/daily-goals`)**
-    - Daily XP target bar (Earn 50 XP) and active quest list with claim reward actions.
-
-11. **Hearts Hub (`/hearts`)**
-    - Heart status counter, refill with gems, practice to earn heart, and auto-regen timer.
-
-12. **Settings (`/settings`)**
-    - Dark Mode toggle, Sound FX, Streak Reminders, and Session logout.
+```env
+DATABASE_URL=sqlite:///./lingoquest.db
+SECRET_KEY=CHANGE_ME_PRODUCTION_SECRET
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+NEXT_PUBLIC_API_URL=http://localhost:8000
+ALLOWED_ORIGINS=http://localhost:3000
+```
 
 ---
 
-## Getting Started Locally
+## 🚀 Running Locally
 
-### 1. Run the Backend API
-
-```bash
-cd backend
-python -m app.seed.seed_data   # Seeds the SQLite database
-uvicorn app.main:app --reload  # Starts API at http://localhost:8000
-```
-
-### 2. Run the Next.js Frontend
+Launch both the **FastAPI backend** and **Next.js frontend** concurrently with a single command from the root directory:
 
 ```bash
-cd frontend
-npm install --legacy-peer-deps
-npm run dev                    # Starts frontend at http://localhost:3000
+npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+- **Backend API & Swagger**: `http://localhost:8000/docs`
+- **Backend Health Check**: `http://localhost:8000/health`
+- **Frontend Web App**: `http://localhost:3000`
+
+---
+
+## 🌐 Deploying to Production
+
+### 1. Frontend (Vercel)
+1. Push repository to GitHub.
+2. Import `frontend/` directory into Vercel.
+3. Set environment variable: `NEXT_PUBLIC_API_URL=https://your-backend-api.onrender.com`.
+
+### 2. Backend (Render / Railway / Docker)
+1. Import `backend/` repository into Render or Railway.
+2. Build command: `pip install -r requirements.txt && python -m app.seed.seed_data`.
+3. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+4. Set environment variable: `ALLOWED_ORIGINS=https://your-frontend.vercel.app`.

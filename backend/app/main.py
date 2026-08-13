@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+import os
+import logging
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.session import Base, engine
 from app.seed.seed_data import seed_database
@@ -7,23 +10,50 @@ from app.api import (
     statistics, shop, daily_goals, user
 )
 
+# Configure Production Logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+logger = logging.getLogger("lingoquest")
+
 # Initialize Database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="LingoQuest API",
+    title="LingoQuest Production API",
     description="Gamified Language Learning Backend API built for Duolingo Clone",
     version="1.0.0"
 )
 
-# Allow CORS for Next.js Frontend
+# CORS Configuration
+allowed_origins_env = os.environ.get("ALLOWED_ORIGINS", "")
+if allowed_origins_env:
+    origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+else:
+    origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Global Exception Handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Global exception on {request.url.path}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected server error occurred."}
+    )
+
+# Health Check Endpoint
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 # Include Routers
 app.include_router(auth.router)
@@ -38,7 +68,7 @@ app.include_router(user.router)
 
 @app.on_event("startup")
 def startup_event():
-    # Automatically seed database on first startup if empty
+    logger.info("Starting LingoQuest FastAPI Application...")
     try:
         from app.models.models import User
         from app.database.session import SessionLocal
@@ -46,10 +76,11 @@ def startup_event():
         user_count = db.query(User).count()
         db.close()
         if user_count == 0:
+            logger.info("Database is empty. Running seed_database()...")
             seed_database()
     except Exception as e:
-        print(f"Startup check/seed note: {e}")
+        logger.warning(f"Startup check/seed note: {e}")
 
 @app.get("/")
 def root():
-    return {"message": "LingoQuest API is running smoothly!", "version": "1.0.0"}
+    return {"message": "LingoQuest API is running smoothly!", "version": "1.0.0", "status": "ok"}
