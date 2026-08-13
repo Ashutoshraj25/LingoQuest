@@ -56,6 +56,12 @@ def get_dashboard(user_id: int = 1, db: Session = Depends(get_db)):
 
     return DashboardResponse(
         user=UserResponse.from_orm(user),
-        current_course={"id": course.id, "title": course.title, "flag": course.flag_emoji} if course else None,
+        current_course={
+            "id": course.id,
+            "title": course.title,
+            "code": getattr(course, "code", "hi"),
+            "flag": course.flag_emoji,
+            "flag_emoji": course.flag_emoji
+        } if course else None,
         units=units_data
     )
