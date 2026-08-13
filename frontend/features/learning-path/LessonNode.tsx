@@ -10,82 +10,78 @@ import { Button } from "@/components/ui/Button";
 interface LessonNodeProps {
   id: number;
   title: string;
-  order: number;
+  order?: number;
   completedLessons: number;
   totalLessons: number;
   isUnlocked: boolean;
   isCompleted: boolean;
+  colorHex?: string;
+  xOffset?: number;
   offsetPercentage?: number; // Zigzag horizontal offset -50 to 50
 }
 
 export const LessonNode: React.FC<LessonNodeProps> = ({
   id,
   title,
+  order = 1,
   completedLessons,
   totalLessons,
   isUnlocked,
   isCompleted,
+  colorHex = "#58CC02",
+  xOffset,
   offsetPercentage = 0,
 }) => {
   const [showPopover, setShowPopover] = useState(false);
-
-  const progressPct = Math.round((completedLessons / totalLessons) * 100);
-  const isActive = isUnlocked && !isCompleted;
+  const offset = xOffset !== undefined ? xOffset : offsetPercentage;
 
   return (
     <div
-      className="relative flex flex-col items-center my-6"
-      style={{ transform: `translateX(${offsetPercentage}px)` }}
+      className="relative flex flex-col items-center my-3"
+      style={{ transform: `translateX(${offset}px)` }}
     >
       {/* Node Button */}
       <button
         onClick={() => isUnlocked && setShowPopover(!showPopover)}
-        className="relative group focus:outline-none"
+        disabled={!isUnlocked}
+        className={`relative w-20 h-20 rounded-full flex items-center justify-center font-extrabold transition-all duration-200 shadow-md ${
+          isCompleted
+            ? "bg-duo-yellow text-white hover:brightness-105 active:scale-95 border-b-4 border-amber-600"
+            : isUnlocked
+            ? "bg-duo-green text-white hover:brightness-105 active:scale-95 border-b-4 border-emerald-700"
+            : "bg-gray-200 dark:bg-slate-800 text-gray-400 border-b-4 border-gray-300 dark:border-slate-700 cursor-not-allowed"
+        }`}
       >
-        <ProgressRing progress={progressPct} radius={44} stroke={7} color="#58CC02">
-          <div
-            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200 shadow-duo ${
-              isCompleted
-                ? "bg-duo-yellow shadow-duo-yellow text-white"
-                : isActive
-                ? "bg-duo-green shadow-duo-green text-white active-node-pulse"
-                : "bg-gray-200 dark:bg-slate-800 text-gray-400 border-2 border-gray-300 dark:border-slate-700"
-            }`}
-          >
-            {isCompleted ? (
-              <Crown className="w-8 h-8 fill-white" />
-            ) : isActive ? (
-              <Star className="w-8 h-8 fill-white" />
-            ) : (
-              <Lock className="w-6 h-6" />
-            )}
-          </div>
-        </ProgressRing>
+        {isCompleted ? (
+          <Check className="w-9 h-9 stroke-[3]" />
+        ) : isUnlocked ? (
+          <Star className="w-9 h-9 fill-current" />
+        ) : (
+          <Lock className="w-7 h-7 text-gray-400 dark:text-slate-600" />
+        )}
       </button>
 
-      {/* Popover Card */}
+      {/* Popover Card on Click */}
       <AnimatePresence>
-        {showPopover && (
+        {showPopover && isUnlocked && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: -10 }}
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: -10 }}
-            className="absolute z-50 top-24 w-64 p-4 bg-duo-green rounded-3xl text-white shadow-xl text-center"
+            exit={{ opacity: 0, scale: 0.9, y: 10 }}
+            className="absolute bottom-24 z-40 w-64 bg-duo-green text-white rounded-2xl p-4 shadow-2xl border-2 border-emerald-400 text-center"
           >
-            <div className="font-extrabold text-lg mb-1">{title}</div>
-            <p className="text-xs text-white/90 font-semibold mb-4">
-              Lesson {completedLessons + 1} of {totalLessons} • +25 XP
+            <h4 className="font-extrabold text-lg mb-1">{title}</h4>
+            <p className="text-xs font-semibold text-emerald-100 mb-3">
+              Lesson {completedLessons} of {totalLessons}
             </p>
-
             <Link href={`/lesson/${id}`}>
-              <Button variant="white" size="full">
-                <Play className="w-5 h-5 fill-duo-green text-duo-green inline mr-2" />
-                START +25 XP
+              <Button
+                variant="white"
+                className="w-full text-duo-green bg-white hover:bg-emerald-50 text-xs font-black uppercase tracking-wider py-2.5 shadow-md"
+              >
+                Start +15 XP
               </Button>
             </Link>
-
-            {/* Triangle pointer */}
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-b-8 border-b-duo-green" />
           </motion.div>
         )}
       </AnimatePresence>

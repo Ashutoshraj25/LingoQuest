@@ -35,11 +35,15 @@ class ResetPasswordRequest(BaseModel):
     otp_code: Optional[str] = None
     new_password: str
 
+class SwitchLanguageRequest(BaseModel):
+    language: str
+
 class UserResponse(UserBase):
     id: int
     avatar_url: str
     provider: Optional[str] = "email"
     google_id: Optional[str] = None
+    current_course_id: Optional[int] = 1
     is_verified: bool
     is_premium: bool
     xp: int

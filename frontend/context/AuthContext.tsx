@@ -28,6 +28,7 @@ interface AuthContextType {
   login: (credentials: any) => Promise<void>;
   register: (data: any) => Promise<void>;
   googleLogin: (googleData: any) => Promise<void>;
+  guestLogin: () => Promise<void>;
   logout: () => void;
 }
 
@@ -103,6 +104,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/");
   };
 
+  const guestLogin = async () => {
+    const res = await api.guestLogin();
+    saveAuthSession(res);
+    router.push("/");
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("refresh_token");
@@ -116,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, googleLogin, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, googleLogin, guestLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );

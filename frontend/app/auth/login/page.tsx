@@ -7,10 +7,11 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Mascot } from "@/components/ui/Mascot";
 import { useAuth } from "@/context/AuthContext";
+import { Zap } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, googleLogin } = useAuth();
+  const { login, googleLogin, guestLogin } = useAuth();
   const [email, setEmail] = useState("ashutosh@example.com");
   const [password, setPassword] = useState("password123");
   const [rememberMe, setRememberMe] = useState(true);
@@ -56,6 +57,17 @@ export default function LoginPage() {
     }
   };
 
+  const handleGuestSignIn = async () => {
+    setLoading(true);
+    try {
+      await guestLogin();
+    } catch (err: any) {
+      setError("Guest login failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col items-center justify-center p-4">
       <div className="max-w-md w-full text-center">
@@ -84,6 +96,17 @@ export default function LoginPage() {
               {error}
             </div>
           )}
+
+          {/* Instant Guest Login Button */}
+          <button
+            type="button"
+            onClick={handleGuestSignIn}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-duo-green hover:bg-emerald-600 text-white font-black text-sm transition-all mb-3 shadow-md shadow-duo-green/20"
+          >
+            <Zap className="w-5 h-5 fill-yellow-300 text-yellow-300 animate-bounce" />
+            <span>CONTINUE AS GUEST (FAST LOG IN)</span>
+          </button>
 
           {/* Google Sign In Button */}
           <button

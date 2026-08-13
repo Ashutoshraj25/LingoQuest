@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Flame, Heart, Gem, ChevronDown, User, Settings, BarChart2, Trophy, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
 
 interface NavbarProps {
   user?: {
@@ -17,22 +18,18 @@ interface NavbarProps {
     avatar_url: string;
     language_to_learn?: string;
   };
+  onLanguageChange?: () => void;
 }
 
 const INDIAN_LANGUAGES = [
   { code: "hi", name: "Hindi", flag: "🇮🇳" },
-  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "mr", name: "Marathi", flag: "🇮🇳" },
   { code: "bn", name: "Bengali", flag: "🇮🇳" },
   { code: "ta", name: "Tamil", flag: "🇮🇳" },
   { code: "te", name: "Telugu", flag: "🇮🇳" },
-  { code: "mr", name: "Marathi", flag: "🇮🇳" },
-  { code: "kn", name: "Kannada", flag: "🇮🇳" },
-  { code: "ml", name: "Malayalam", flag: "🇮🇳" },
-  { code: "gu", name: "Gujarati", flag: "🇮🇳" },
-  { code: "pa", name: "Punjabi", flag: "🇮🇳" },
 ];
 
-export const Navbar: React.FC<NavbarProps> = ({ user: propUser }) => {
+export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange }) => {
   const { user: authUser, logout } = useAuth();
   
   const user = authUser || propUser || {
@@ -52,6 +49,34 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser }) => {
   );
   const [isOpen, setIsOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    if (user.language_to_learn) {
+      const match = INDIAN_LANGUAGES.find((l) => l.name.toLowerCase() === user.language_to_learn?.toLowerCase());
+      if (match) setSelectedLang(match);
+    }
+  }, [user.language_to_learn]);
+
+  const handleLanguageSelect = (lang: typeof INDIAN_LANGUAGES[0]) => {
+    setSelectedLang(lang);
+    setIsOpen(false);
+
+    api.switchLanguage(lang.name)
+      .then((updatedUser) => {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        }
+        if (onLanguageChange) {
+          onLanguageChange();
+        } else {
+          window.location.reload();
+        }
+      })
+      .catch((err) => {
+        console.error("Language switch error:", err);
+        window.location.reload();
+      });
+  };
 
   const streakValue = (user as any).streak_count || (user as any).streak || 5;
 
@@ -75,10 +100,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser }) => {
             {INDIAN_LANGUAGES.map((lang) => (
               <button
                 key={lang.code}
-                onClick={() => {
-                  setSelectedLang(lang);
-                  setIsOpen(false);
-                }}
+                onClick={() => handleLanguageSelect(lang)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
                   selectedLang.code === lang.code
                     ? "bg-sky-50 dark:bg-slate-700 text-duo-blue"

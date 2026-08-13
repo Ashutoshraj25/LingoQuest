@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sidebar } from "@/components/ui/Sidebar";
@@ -13,11 +13,31 @@ import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Flame, Trophy, Sparkles, Dumbbell } from "lucide-react";
 import { api } from "@/lib/api";
 import { clearAuthSession, getStoredToken, getStoredUser } from "@/lib/auth";
+import { FirstLanguageModal } from "@/components/auth/FirstLanguageModal";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+
+  const fetchDashboard = useCallback((userId: number) => {
+    api.getDashboard(userId)
+      .then((data) => {
+        setDashboardData(data);
+        if (!data?.user?.language_to_learn) {
+          setShowLanguageModal(true);
+        }
+      })
+      .catch((err) => {
+        if (err instanceof Error && /401|403|404/.test(err.message)) {
+          clearAuthSession();
+          router.replace("/auth/login");
+          return;
+        }
+        console.warn("Fallback dashboard data:", err);
+      });
+  }, [router]);
 
   useEffect(() => {
     const token = getStoredToken();
@@ -29,68 +49,77 @@ export default function DashboardPage() {
     }
 
     setIsCheckingAuth(false);
-    api.getDashboard(storedUser.id)
-      .then((data) => setDashboardData(data))
-      .catch((err) => {
-        if (err instanceof Error && /401|403|404/.test(err.message)) {
-          clearAuthSession();
-          router.replace("/auth/login");
-          return;
-        }
-        console.warn("Fallback dashboard mock data due to:", err);
-      });
-  }, [router]);
+    fetchDashboard(storedUser.id);
+  }, [router, fetchDashboard]);
 
   if (isCheckingAuth) {
     return null;
   }
 
   const user = dashboardData?.user || {
-    username: "AlexExplorer",
+    username: "AshutoshExplorer",
+    full_name: "Ashutosh Raj",
     streak: 5,
-    xp: 450,
+    streak_count: 5,
+    xp: 1240,
     hearts: 5,
-    gems: 1200,
-    avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Alex",
+    gems: 450,
+    avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Ashutosh",
+    language_to_learn: "Hindi",
   };
 
-  const units = dashboardData?.units || [
+  const activeLang = user.language_to_learn || "Hindi";
+
+  const units = dashboardData?.units?.length > 0 ? dashboardData.units : [
     {
       id: 1,
       order: 1,
-      title: "Unit 1: Section 1 - French Basics",
-      description: "Form basic sentences, greet people, and introduce yourself in French.",
+      title: `Unit 1: ${activeLang} Basics & Greetings`,
+      description: `Learn essential ${activeLang} greetings, daily vocabulary, and sentence structures.`,
       color_hex: "#58CC02",
       skills: [
-        { id: 1, title: "Greetings", completed_lessons: 4, total_lessons: 4, is_unlocked: true, is_completed: true },
-        { id: 2, title: "Basics 1", completed_lessons: 2, total_lessons: 4, is_unlocked: true, is_completed: false },
-        { id: 3, title: "Food & Cafe", completed_lessons: 0, total_lessons: 4, is_unlocked: true, is_completed: false },
-        { id: 4, title: "People & Family", completed_lessons: 0, total_lessons: 4, is_unlocked: false, is_completed: false },
+        { id: 1, title: `${activeLang} Greetings`, completed_lessons: 4, total_lessons: 4, is_unlocked: true, is_completed: true },
+        { id: 2, title: "Pronouns & Verbs", completed_lessons: 2, total_lessons: 4, is_unlocked: true, is_completed: false },
+        { id: 3, title: "Family Members", completed_lessons: 0, total_lessons: 4, is_unlocked: true, is_completed: false },
+        { id: 4, title: "Numbers 1-10", completed_lessons: 0, total_lessons: 4, is_unlocked: false, is_completed: false },
       ],
     },
     {
       id: 2,
       order: 2,
-      title: "Unit 2: Daily Routine & Food",
-      description: "Order food at a bistro, talk about drinks and daily habits.",
+      title: `Unit 2: ${activeLang} Food & Ordering`,
+      description: `Order regional Indian dishes, drinks, and express tastes in ${activeLang}.`,
       color_hex: "#CE82FF",
       skills: [
-        { id: 5, title: "Breakfast Nouns", completed_lessons: 0, total_lessons: 4, is_unlocked: false, is_completed: false },
-        { id: 6, title: "Phrases 2", completed_lessons: 0, total_lessons: 4, is_unlocked: false, is_completed: false },
+        { id: 5, title: "Food & Drinks", completed_lessons: 0, total_lessons: 4, is_unlocked: false, is_completed: false },
+        { id: 6, title: "Restaurant Phrases", completed_lessons: 0, total_lessons: 4, is_unlocked: false, is_completed: false },
       ],
     },
   ];
 
-  // Zigzag offsets for lesson nodes
   const offsets = [0, 45, 75, 45, 0, -45, -75, -45];
+
+  const handleLanguageModalSelect = (selectedLang: string) => {
+    setShowLanguageModal(false);
+    if (dashboardData?.user) {
+      fetchDashboard(dashboardData.user.id);
+    } else {
+      window.location.reload();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900">
       <Sidebar />
-      <Navbar user={user} />
+      <Navbar user={user} onLanguageChange={() => fetchDashboard(user.id)} />
+
+      <FirstLanguageModal
+        isOpen={showLanguageModal}
+        onSelectLanguage={handleLanguageModalSelect}
+      />
 
       <main className="md:pl-64 pt-16 flex flex-col lg:flex-row">
-        {/* Central Path Area */}
+        {/* Central Learning Path */}
         <div className="flex-1 max-w-2xl mx-auto px-4 py-8">
           {units.map((unit: any) => (
             <div key={unit.id} className="mb-12">
@@ -101,89 +130,95 @@ export default function DashboardPage() {
                 colorHex={unit.color_hex}
               />
 
-              {/* Path Lesson Nodes */}
-              <div className="flex flex-col items-center py-4 relative">
-                {unit.skills.map((skill: any, idx: number) => (
-                  <LessonNode
-                    key={skill.id}
-                    id={skill.id}
-                    title={skill.title}
-                    order={idx + 1}
-                    completedLessons={skill.completed_lessons}
-                    totalLessons={skill.total_lessons}
-                    isUnlocked={skill.is_unlocked}
-                    isCompleted={skill.is_completed}
-                    offsetPercentage={offsets[idx % offsets.length]}
-                  />
-                ))}
+              <div className="flex flex-col items-center py-6 gap-6">
+                {unit.skills.map((skill: any, idx: number) => {
+                  const xOffset = offsets[idx % offsets.length];
+                  return (
+                    <LessonNode
+                      key={skill.id}
+                      id={skill.id}
+                      title={skill.title}
+                      completedLessons={skill.completed_lessons}
+                      totalLessons={skill.total_lessons}
+                      isUnlocked={skill.is_unlocked}
+                      isCompleted={skill.is_completed}
+                      colorHex={unit.color_hex}
+                      xOffset={xOffset}
+                    />
+                  );
+                })}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Right Sidebar Widgets */}
-        <div className="w-full lg:w-80 p-6 space-y-6 border-l-2 border-gray-100 dark:border-slate-800">
-          {/* Daily Goal Widget */}
-          <Card>
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-extrabold text-sm uppercase text-gray-400">Daily Goal</span>
-              <Flame className="w-5 h-5 text-duo-orange" />
-            </div>
-            <div className="flex items-baseline justify-between mb-2">
-              <span className="text-xl font-extrabold text-gray-800 dark:text-slate-100">35 / 50 XP</span>
-              <span className="text-xs font-bold text-duo-green">70%</span>
-            </div>
-            <ProgressBar progress={70} color="orange" height="h-3" />
-            <p className="text-xs text-gray-400 mt-3 font-semibold">
-              Complete 1 more lesson to reach your daily goal!
-            </p>
-          </Card>
-
-          {/* Practice Hub Quick Action */}
-          <Card hoverable className="bg-gradient-to-br from-sky-50 to-blue-50 dark:from-slate-800 dark:to-slate-800/80 border-duo-blue">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2.5 bg-duo-blue rounded-xl text-white">
-                <Dumbbell className="w-6 h-6" />
+        {/* Right Sidebar Widget */}
+        <div className="w-full lg:w-80 p-6 space-y-6">
+          <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 bg-sky-50/50 dark:bg-slate-800/50 space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-duo-blue/10 flex items-center justify-center text-duo-blue font-black text-xl">
+                🇮🇳
               </div>
               <div>
-                <h4 className="font-extrabold text-base text-gray-800 dark:text-slate-100 font-['Fredoka']">Practice Hub</h4>
-                <p className="text-xs text-gray-500 font-semibold">Review mistakes & weak skills</p>
+                <h3 className="font-extrabold text-sm text-gray-800 dark:text-slate-100">
+                  {user.language_to_learn || "Hindi"} Course
+                </h3>
+                <p className="text-xs font-bold text-gray-400">
+                  Active Learning Path
+                </p>
               </div>
             </div>
+            <ProgressBar value={45} max={100} colorHex="#1CB0F6" height="h-2.5" />
+            <div className="flex justify-between items-center text-xs font-extrabold text-gray-500">
+              <span>Path Progress</span>
+              <span>45%</span>
+            </div>
+          </Card>
+
+          <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-extrabold text-gray-800 dark:text-slate-100">
+                <Dumbbell className="w-5 h-5 text-duo-purple" />
+                <span>Daily Practice</span>
+              </div>
+              <span className="text-xs font-extrabold text-duo-purple bg-duo-purple/10 px-2.5 py-1 rounded-full uppercase">
+                +15 XP
+              </span>
+            </div>
+            <p className="text-xs font-semibold text-gray-500 dark:text-slate-400">
+              Strengthen your {user.language_to_learn || "Hindi"} vocabulary and grammar skills.
+            </p>
             <Link href="/practice">
-              <Button variant="blue" size="full">PRACTICE NOW</Button>
+              <Button variant="purple" className="w-full text-xs py-2.5 uppercase font-black tracking-wide">
+                Start Practice Mode
+              </Button>
             </Link>
           </Card>
 
-          {/* Leaderboard Preview */}
-          <Card>
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="font-extrabold text-base font-['Fredoka']">Gold League</h4>
-              <Link href="/leaderboard" className="text-xs font-bold text-duo-blue hover:underline">
-                VIEW ALL
+          <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 font-extrabold text-gray-800 dark:text-slate-100">
+                <Trophy className="w-5 h-5 text-duo-yellow" />
+                <span>Gold League</span>
+              </div>
+              <Link href="/leaderboard" className="text-xs font-extrabold text-duo-blue hover:underline">
+                View All
               </Link>
             </div>
-            <div className="space-y-3 text-sm font-bold">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-duo-yellow font-black">1</span>
-                  <span>Sam J.</span>
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-slate-800/80 text-xs font-bold">
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-duo-yellow">#1</span>
+                  <span>Aarav Sharma</span>
                 </div>
-                <span className="text-gray-400">5,100 XP</span>
+                <span className="font-extrabold text-gray-500">5,100 XP</span>
               </div>
-              <div className="flex items-center justify-between p-2 bg-sky-50 dark:bg-slate-800 rounded-xl border border-duo-blue">
-                <div className="flex items-center gap-3">
-                  <span className="text-duo-blue font-black">2</span>
-                  <span>{user.username} (You)</span>
+              <div className="flex items-center justify-between p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-duo-green text-xs font-bold">
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-duo-green">#2</span>
+                  <span className="text-duo-green font-extrabold">You (Ashutosh)</span>
                 </div>
-                <span className="text-duo-blue font-black">4,250 XP</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-amber-700 font-black">3</span>
-                  <span>Taylor K.</span>
-                </div>
-                <span className="text-gray-400">4,200 XP</span>
+                <span className="font-extrabold text-duo-green">4,250 XP</span>
               </div>
             </div>
           </Card>

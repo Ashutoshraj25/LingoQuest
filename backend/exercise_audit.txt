@@ -1,0 +1,189 @@
+=== Lesson ID 1: Vowels Part 1 ===
+Total Exercises: 10
+  Ex ID 1: Type=multiple_choice, Q='Which Hindi vowel makes the 'A' sound in 'Anaar' (Pomegranate)?', Ans='अ', Opts=['अ', 'आ', 'इ']
+  Ex ID 2: Type=fill_blank, Q='Complete: ______ (a) se Anaar.', Ans='अ', Opts=[]
+  Ex ID 3: Type=word_bank, Q='Arrange: 'अ आ इ ई'', Ans='अ आ इ ई', Opts=['अ', 'आ', 'इ', 'ई']
+  Ex ID 4: Type=multiple_choice, Q='Which letter represents the long 'AA' sound in 'Aam' (Mango)?', Ans='आ', Opts=['आ', 'अ', 'उ']
+
+=== Lesson ID 2: Vowels Part 2 ===
+Total Exercises: 10
+  Ex ID 11: Type=multiple_choice, Q='Which Hindi vowel makes the 'U' sound in 'Ullu' (Owl)?', Ans='उ', Opts=['उ', 'ऊ', 'ऋ']
+  Ex ID 12: Type=fill_blank, Q='Complete: ______ (u) se Ullu.', Ans='उ', Opts=[]
+  Ex ID 13: Type=word_bank, Q='Arrange: 'उ ऊ ऋ ए'', Ans='उ ऊ ऋ ए', Opts=['उ', 'ऊ', 'ऋ', 'ए']
+  Ex ID 14: Type=multiple_choice, Q='Which letter represents the sound 'Oo' in 'Oon' (Wool)?', Ans='ऊ', Opts=['ऊ', 'उ']
+
+=== Lesson ID 6: Hello & Namaste ===
+Total Exercises: 10
+  Ex ID 51: Type=multiple_choice, Q='[Hello & Namaste] How do you say 'Hello' respectfully in Hindi?', Ans='नमस्ते', Opts=['नमस्ते', 'धन्यवाद', 'अलविदा']
+  Ex ID 52: Type=fill_blank, Q='[Hello & Namaste] Complete: ______ (Hello), aap kaise hain?', Ans='नमस्ते', Opts=[]
+  Ex ID 53: Type=word_bank, Q='[Hello & Namaste] Arrange: 'Namaste aap kaise hain?'', Ans='नमस्ते आप कैसे हैं?', Opts=['नमस्ते', 'आप', 'कैसे', 'हैं?']
+  Ex ID 54: Type=multiple_choice, Q='[Hello & Namaste] Translate 'Thank you' in Hindi:', Ans='धन्यवाद', Opts=['धन्यवाद', 'नमस्ते']
+
+=== Lesson ID 26: Morning Chai ===
+Total Exercises: 10
+  Ex ID 251: Type=multiple_choice, Q='[Morning Chai] How do you order 'Morning Chai' in Hindi?', Ans='एक प्लेट Morning Chai दीजिए', Opts=['एक प्लेट Morning Chai दीजिए', 'पानी दीजिए']
+  Ex ID 252: Type=fill_blank, Q='[Morning Chai] Complete: Mujhe ______ (Morning Chai) bahut pasand hai.', Ans='Morning Chai', Opts=[]
+  Ex ID 253: Type=word_bank, Q='[Morning Chai] Arrange: 'Mujhe garam Morning Chai pasand hai'', Ans='मुझे गर्म Morning Chai पसंद है', Opts=['मुझे', 'गर्म', 'Morning Chai', 'पसंद', 'है']
+  Ex ID 254: Type=multiple_choice, Q='[Morning Chai] What is the Hindi word for 'Delicious'?', Ans='स्वादिष्ट', Opts=['स्वादिष्ट', 'खट्टा']
+
+=== Lesson ID 51: Left & Right ===
+Total Exercises: 10
+  Ex ID 501: Type=multiple_choice, Q='[Left & Right] Travel phrase for 'Left & Right':', Ans='कृपया Left & Right बताइए', Opts=['कृपया Left & Right बताइए', 'रोको']
+  Ex ID 502: Type=fill_blank, Q='[Left & Right] Complete: Auto ko ______ (Left) modo.', Ans='बाएँ', Opts=[]
+  Ex ID 503: Type=word_bank, Q='[Left & Right] Arrange: 'Seedhe jaiye aur baayein mudiye'', Ans='सीधे जाइए और बाएँ मुड़िए', Opts=['सीधे', 'जाइए', 'और', 'बाएँ', 'मुड़िए']
+  Ex ID 504: Type=multiple_choice, Q='[Left & Right] Translate 'Straight' into Hindi:', Ans='सीधे', Opts=['सीधे', 'बाएँ']
+
+=== Lesson ID 76: Ask Price ===
+Total Exercises: 10
+  Ex ID 751: Type=multiple_choice, Q='[Ask Price] Hindi phrase for 'Ask Price':', Ans='Ask Price की शुभकामनाएं', Opts=['Ask Price की शुभकामनाएं', 'धन्यवाद']
+  Ex ID 752: Type=fill_blank, Q='[Ask Price] Complete: Bharat mein ______ (Ask Price) Dhoom-dham se manate hain.', Ans='Ask Price', Opts=[]
+  Ex ID 753: Type=word_bank, Q='[Ask Price] Arrange: 'Ask Price ki shubhkamnayein'', Ans='Ask Price की हार्दिक शुभकामनाएं', Opts=['Ask Price', 'की', 'हार्दिक', 'शुभकामनाएं']
+  Ex ID 754: Type=multiple_choice, Q='[Ask Price] What is the Hindi word for 'Happiness'?', Ans='खुशी', Opts=['खुशी', 'दुःख']
+
+=== Lesson ID 101: Poetry & Verses ===
+Total Exercises: 10
+  Ex ID 1001: Type=multiple_choice, Q='[Poetry & Verses] Hindi phrase for 'Poetry & Verses':', Ans='Poetry & Verses की शुभकामनाएं', Opts=['Poetry & Verses की शुभकामनाएं', 'धन्यवाद']
+  Ex ID 1002: Type=fill_blank, Q='[Poetry & Verses] Complete: Bharat mein ______ (Poetry & Verses) Dhoom-dham se manate hain.', Ans='Poetry & Verses', Opts=[]
+  Ex ID 1003: Type=word_bank, Q='[Poetry & Verses] Arrange: 'Poetry & Verses ki shubhkamnayein'', Ans='Poetry & Verses की हार्दिक शुभकामनाएं', Opts=['Poetry & Verses', 'की', 'हार्दिक', 'शुभकामनाएं']
+  Ex ID 1004: Type=multiple_choice, Q='[Poetry & Verses] What is the Hindi word for 'Happiness'?', Ans='खुशी', Opts=['खुशी', 'दुःख']
+
+=== Lesson ID 126: Vowels Part 1 ===
+Total Exercises: 10
+  Ex ID 1251: Type=multiple_choice, Q='[Vowels Part 1] What is the Marathi phrase for 'Vowels Part 1'?', Ans='नमस्कार (Vowels Part 1)', Opts=['नमस्कार (Vowels Part 1)', 'धन्यवाद']
+  Ex ID 1252: Type=fill_blank, Q='[Vowels Part 1] Complete: Marathi ______ (Vowels Part 1) khup chaan ahe.', Ans='Vowels Part 1', Opts=[]
+  Ex ID 1253: Type=word_bank, Q='[Vowels Part 1] Arrange: 'Mala Marathi Vowels Part 1 aavadte'', Ans='मला मराठी Vowels Part 1 आवडते', Opts=['मला', 'मराठी', 'Vowels Part 1', 'आवडते']
+  Ex ID 1254: Type=multiple_choice, Q='[Vowels Part 1] What is 'Thank you' in Marathi?', Ans='धन्यवाद', Opts=['धन्यवाद', 'नमस्कार']
+
+=== Lesson ID 151: Morning Chai ===
+Total Exercises: 10
+  Ex ID 1501: Type=multiple_choice, Q='[Morning Chai] What is the Marathi phrase for 'Morning Chai'?', Ans='नमस्कार (Morning Chai)', Opts=['नमस्कार (Morning Chai)', 'धन्यवाद']
+  Ex ID 1502: Type=fill_blank, Q='[Morning Chai] Complete: Marathi ______ (Morning Chai) khup chaan ahe.', Ans='Morning Chai', Opts=[]
+  Ex ID 1503: Type=word_bank, Q='[Morning Chai] Arrange: 'Mala Marathi Morning Chai aavadte'', Ans='मला मराठी Morning Chai आवडते', Opts=['मला', 'मराठी', 'Morning Chai', 'आवडते']
+  Ex ID 1504: Type=multiple_choice, Q='[Morning Chai] What is 'Thank you' in Marathi?', Ans='धन्यवाद', Opts=['धन्यवाद', 'नमस्कार']
+
+=== Lesson ID 176: Left & Right ===
+Total Exercises: 10
+  Ex ID 1751: Type=multiple_choice, Q='[Left & Right] What is the Marathi phrase for 'Left & Right'?', Ans='नमस्कार (Left & Right)', Opts=['नमस्कार (Left & Right)', 'धन्यवाद']
+  Ex ID 1752: Type=fill_blank, Q='[Left & Right] Complete: Marathi ______ (Left & Right) khup chaan ahe.', Ans='Left & Right', Opts=[]
+  Ex ID 1753: Type=word_bank, Q='[Left & Right] Arrange: 'Mala Marathi Left & Right aavadte'', Ans='मला मराठी Left & Right आवडते', Opts=['मला', 'मराठी', 'Left & Right', 'आवडते']
+  Ex ID 1754: Type=multiple_choice, Q='[Left & Right] What is 'Thank you' in Marathi?', Ans='धन्यवाद', Opts=['धन्यवाद', 'नमस्कार']
+
+=== Lesson ID 201: Ask Price ===
+Total Exercises: 10
+  Ex ID 2001: Type=multiple_choice, Q='[Ask Price] What is the Marathi phrase for 'Ask Price'?', Ans='नमस्कार (Ask Price)', Opts=['नमस्कार (Ask Price)', 'धन्यवाद']
+  Ex ID 2002: Type=fill_blank, Q='[Ask Price] Complete: Marathi ______ (Ask Price) khup chaan ahe.', Ans='Ask Price', Opts=[]
+  Ex ID 2003: Type=word_bank, Q='[Ask Price] Arrange: 'Mala Marathi Ask Price aavadte'', Ans='मला मराठी Ask Price आवडते', Opts=['मला', 'मराठी', 'Ask Price', 'आवडते']
+  Ex ID 2004: Type=multiple_choice, Q='[Ask Price] What is 'Thank you' in Marathi?', Ans='धन्यवाद', Opts=['धन्यवाद', 'नमस्कार']
+
+=== Lesson ID 226: Poetry & Verses ===
+Total Exercises: 10
+  Ex ID 2251: Type=multiple_choice, Q='[Poetry & Verses] What is the Marathi phrase for 'Poetry & Verses'?', Ans='नमस्कार (Poetry & Verses)', Opts=['नमस्कार (Poetry & Verses)', 'धन्यवाद']
+  Ex ID 2252: Type=fill_blank, Q='[Poetry & Verses] Complete: Marathi ______ (Poetry & Verses) khup chaan ahe.', Ans='Poetry & Verses', Opts=[]
+  Ex ID 2253: Type=word_bank, Q='[Poetry & Verses] Arrange: 'Mala Marathi Poetry & Verses aavadte'', Ans='मला मराठी Poetry & Verses आवडते', Opts=['मला', 'मराठी', 'Poetry & Verses', 'आवडते']
+  Ex ID 2254: Type=multiple_choice, Q='[Poetry & Verses] What is 'Thank you' in Marathi?', Ans='धन्यवाद', Opts=['धन्यवाद', 'नमस्कार']
+
+=== Lesson ID 251: Vowels Part 1 ===
+Total Exercises: 10
+  Ex ID 2501: Type=multiple_choice, Q='[Vowels Part 1] What is the polite Bengali expression for 'Vowels Part 1'?', Ans='নমস্কার (Vowels Part 1)', Opts=['নমস্কার (Vowels Part 1)', 'ধন্যবাদ']
+  Ex ID 2502: Type=fill_blank, Q='[Vowels Part 1] Complete: Amar ______ (Vowels Part 1) khub bhalo laglo.', Ans='Vowels Part 1', Opts=[]
+  Ex ID 2503: Type=word_bank, Q='[Vowels Part 1] Arrange: 'Ami Bengali Vowels Part 1 shikchhi'', Ans='আমি বাংলা Vowels Part 1 শিখছি', Opts=['আমি', 'বাংলা', 'Vowels Part 1', 'শিখছি']
+  Ex ID 2504: Type=multiple_choice, Q='[Vowels Part 1] Translate 'Thank you' in Bengali:', Ans='ধন্যবাদ', Opts=['ধন্যবাদ', 'নমস্কার']
+
+=== Lesson ID 276: Morning Chai ===
+Total Exercises: 10
+  Ex ID 2751: Type=multiple_choice, Q='[Morning Chai] What is the polite Bengali expression for 'Morning Chai'?', Ans='নমস্কার (Morning Chai)', Opts=['নমস্কার (Morning Chai)', 'ধন্যবাদ']
+  Ex ID 2752: Type=fill_blank, Q='[Morning Chai] Complete: Amar ______ (Morning Chai) khub bhalo laglo.', Ans='Morning Chai', Opts=[]
+  Ex ID 2753: Type=word_bank, Q='[Morning Chai] Arrange: 'Ami Bengali Morning Chai shikchhi'', Ans='আমি বাংলা Morning Chai শিখছি', Opts=['আমি', 'বাংলা', 'Morning Chai', 'শিখছি']
+  Ex ID 2754: Type=multiple_choice, Q='[Morning Chai] Translate 'Thank you' in Bengali:', Ans='ধন্যবাদ', Opts=['ধন্যবাদ', 'নমস্কার']
+
+=== Lesson ID 301: Left & Right ===
+Total Exercises: 10
+  Ex ID 3001: Type=multiple_choice, Q='[Left & Right] What is the polite Bengali expression for 'Left & Right'?', Ans='নমস্কার (Left & Right)', Opts=['নমস্কার (Left & Right)', 'ধন্যবাদ']
+  Ex ID 3002: Type=fill_blank, Q='[Left & Right] Complete: Amar ______ (Left & Right) khub bhalo laglo.', Ans='Left & Right', Opts=[]
+  Ex ID 3003: Type=word_bank, Q='[Left & Right] Arrange: 'Ami Bengali Left & Right shikchhi'', Ans='আমি বাংলা Left & Right শিখছি', Opts=['আমি', 'বাংলা', 'Left & Right', 'শিখছি']
+  Ex ID 3004: Type=multiple_choice, Q='[Left & Right] Translate 'Thank you' in Bengali:', Ans='ধন্যবাদ', Opts=['ধন্যবাদ', 'নমস্কার']
+
+=== Lesson ID 326: Ask Price ===
+Total Exercises: 10
+  Ex ID 3251: Type=multiple_choice, Q='[Ask Price] What is the polite Bengali expression for 'Ask Price'?', Ans='নমস্কার (Ask Price)', Opts=['নমস্কার (Ask Price)', 'ধন্যবাদ']
+  Ex ID 3252: Type=fill_blank, Q='[Ask Price] Complete: Amar ______ (Ask Price) khub bhalo laglo.', Ans='Ask Price', Opts=[]
+  Ex ID 3253: Type=word_bank, Q='[Ask Price] Arrange: 'Ami Bengali Ask Price shikchhi'', Ans='আমি বাংলা Ask Price শিখছি', Opts=['আমি', 'বাংলা', 'Ask Price', 'শিখছি']
+  Ex ID 3254: Type=multiple_choice, Q='[Ask Price] Translate 'Thank you' in Bengali:', Ans='ধন্যবাদ', Opts=['ধন্যবাদ', 'নমস্কার']
+
+=== Lesson ID 351: Poetry & Verses ===
+Total Exercises: 10
+  Ex ID 3501: Type=multiple_choice, Q='[Poetry & Verses] What is the polite Bengali expression for 'Poetry & Verses'?', Ans='নমস্কার (Poetry & Verses)', Opts=['নমস্কার (Poetry & Verses)', 'ধন্যবাদ']
+  Ex ID 3502: Type=fill_blank, Q='[Poetry & Verses] Complete: Amar ______ (Poetry & Verses) khub bhalo laglo.', Ans='Poetry & Verses', Opts=[]
+  Ex ID 3503: Type=word_bank, Q='[Poetry & Verses] Arrange: 'Ami Bengali Poetry & Verses shikchhi'', Ans='আমি বাংলা Poetry & Verses শিখছি', Opts=['আমি', 'বাংলা', 'Poetry & Verses', 'শিখছি']
+  Ex ID 3504: Type=multiple_choice, Q='[Poetry & Verses] Translate 'Thank you' in Bengali:', Ans='ধন্যবাদ', Opts=['ধন্যবাদ', 'নমস্কার']
+
+=== Lesson ID 376: Vowels Part 1 ===
+Total Exercises: 10
+  Ex ID 3751: Type=multiple_choice, Q='[Vowels Part 1] What is the Tamil expression for 'Vowels Part 1'?', Ans='வணக்கம் (Vowels Part 1)', Opts=['வணக்கம் (Vowels Part 1)', 'நன்றி']
+  Ex ID 3752: Type=fill_blank, Q='[Vowels Part 1] Complete: Enakku ______ (Vowels Part 1) romba pidikkum.', Ans='Vowels Part 1', Opts=[]
+  Ex ID 3753: Type=word_bank, Q='[Vowels Part 1] Arrange: 'Naan Tamil Vowels Part 1 katrukolgiren'', Ans='நான் தமிழ் Vowels Part 1 கற்றுக்கொள்கிறேன்', Opts=['நான்', 'தமிழ்', 'Vowels Part 1', 'கற்றுக்கொள்கிறேன்']
+  Ex ID 3754: Type=multiple_choice, Q='[Vowels Part 1] Translate 'Thank you' in Tamil:', Ans='நன்றி', Opts=['நன்றி', 'வணக்கம்']
+
+=== Lesson ID 401: Morning Chai ===
+Total Exercises: 10
+  Ex ID 4001: Type=multiple_choice, Q='[Morning Chai] What is the Tamil expression for 'Morning Chai'?', Ans='வணக்கம் (Morning Chai)', Opts=['வணக்கம் (Morning Chai)', 'நன்றி']
+  Ex ID 4002: Type=fill_blank, Q='[Morning Chai] Complete: Enakku ______ (Morning Chai) romba pidikkum.', Ans='Morning Chai', Opts=[]
+  Ex ID 4003: Type=word_bank, Q='[Morning Chai] Arrange: 'Naan Tamil Morning Chai katrukolgiren'', Ans='நான் தமிழ் Morning Chai கற்றுக்கொள்கிறேன்', Opts=['நான்', 'தமிழ்', 'Morning Chai', 'கற்றுக்கொள்கிறேன்']
+  Ex ID 4004: Type=multiple_choice, Q='[Morning Chai] Translate 'Thank you' in Tamil:', Ans='நன்றி', Opts=['நன்றி', 'வணக்கம்']
+
+=== Lesson ID 426: Left & Right ===
+Total Exercises: 10
+  Ex ID 4251: Type=multiple_choice, Q='[Left & Right] What is the Tamil expression for 'Left & Right'?', Ans='வணக்கம் (Left & Right)', Opts=['வணக்கம் (Left & Right)', 'நன்றி']
+  Ex ID 4252: Type=fill_blank, Q='[Left & Right] Complete: Enakku ______ (Left & Right) romba pidikkum.', Ans='Left & Right', Opts=[]
+  Ex ID 4253: Type=word_bank, Q='[Left & Right] Arrange: 'Naan Tamil Left & Right katrukolgiren'', Ans='நான் தமிழ் Left & Right கற்றுக்கொள்கிறேன்', Opts=['நான்', 'தமிழ்', 'Left & Right', 'கற்றுக்கொள்கிறேன்']
+  Ex ID 4254: Type=multiple_choice, Q='[Left & Right] Translate 'Thank you' in Tamil:', Ans='நன்றி', Opts=['நன்றி', 'வணக்கம்']
+
+=== Lesson ID 451: Ask Price ===
+Total Exercises: 10
+  Ex ID 4501: Type=multiple_choice, Q='[Ask Price] What is the Tamil expression for 'Ask Price'?', Ans='வணக்கம் (Ask Price)', Opts=['வணக்கம் (Ask Price)', 'நன்றி']
+  Ex ID 4502: Type=fill_blank, Q='[Ask Price] Complete: Enakku ______ (Ask Price) romba pidikkum.', Ans='Ask Price', Opts=[]
+  Ex ID 4503: Type=word_bank, Q='[Ask Price] Arrange: 'Naan Tamil Ask Price katrukolgiren'', Ans='நான் தமிழ் Ask Price கற்றுக்கொள்கிறேன்', Opts=['நான்', 'தமிழ்', 'Ask Price', 'கற்றுக்கொள்கிறேன்']
+  Ex ID 4504: Type=multiple_choice, Q='[Ask Price] Translate 'Thank you' in Tamil:', Ans='நன்றி', Opts=['நன்றி', 'வணக்கம்']
+
+=== Lesson ID 476: Poetry & Verses ===
+Total Exercises: 10
+  Ex ID 4751: Type=multiple_choice, Q='[Poetry & Verses] What is the Tamil expression for 'Poetry & Verses'?', Ans='வணக்கம் (Poetry & Verses)', Opts=['வணக்கம் (Poetry & Verses)', 'நன்றி']
+  Ex ID 4752: Type=fill_blank, Q='[Poetry & Verses] Complete: Enakku ______ (Poetry & Verses) romba pidikkum.', Ans='Poetry & Verses', Opts=[]
+  Ex ID 4753: Type=word_bank, Q='[Poetry & Verses] Arrange: 'Naan Tamil Poetry & Verses katrukolgiren'', Ans='நான் தமிழ் Poetry & Verses கற்றுக்கொள்கிறேன்', Opts=['நான்', 'தமிழ்', 'Poetry & Verses', 'கற்றுக்கொள்கிறேன்']
+  Ex ID 4754: Type=multiple_choice, Q='[Poetry & Verses] Translate 'Thank you' in Tamil:', Ans='நன்றி', Opts=['நன்றி', 'வணக்கம்']
+
+=== Lesson ID 501: Vowels Part 1 ===
+Total Exercises: 10
+  Ex ID 5001: Type=multiple_choice, Q='[Vowels Part 1] What is the Telugu phrase for 'Vowels Part 1'?', Ans='నమస్కారం (Vowels Part 1)', Opts=['నమస్కారం (Vowels Part 1)', 'ధన్యవాదాలు']
+  Ex ID 5002: Type=fill_blank, Q='[Vowels Part 1] Complete: Naaku ______ (Vowels Part 1) chala ishtam.', Ans='Vowels Part 1', Opts=[]
+  Ex ID 5003: Type=word_bank, Q='[Vowels Part 1] Arrange: 'Nenu Telugu Vowels Part 1 nerchukuntunnanu'', Ans='నేను తెలుగు Vowels Part 1 నేర్చుకుంటున్నాను', Opts=['నేను', 'తెలుగు', 'Vowels Part 1', 'నేర్చుకుంటున్నాను']
+  Ex ID 5004: Type=multiple_choice, Q='[Vowels Part 1] Translate 'Thank you' in Telugu:', Ans='ధన్యవాదాలు', Opts=['ధన్యవాదాలు', 'నమస్కారం']
+
+=== Lesson ID 526: Morning Chai ===
+Total Exercises: 10
+  Ex ID 5251: Type=multiple_choice, Q='[Morning Chai] What is the Telugu phrase for 'Morning Chai'?', Ans='నమస్కారం (Morning Chai)', Opts=['నమస్కారం (Morning Chai)', 'ధన్యవాదాలు']
+  Ex ID 5252: Type=fill_blank, Q='[Morning Chai] Complete: Naaku ______ (Morning Chai) chala ishtam.', Ans='Morning Chai', Opts=[]
+  Ex ID 5253: Type=word_bank, Q='[Morning Chai] Arrange: 'Nenu Telugu Morning Chai nerchukuntunnanu'', Ans='నేను తెలుగు Morning Chai నేర్చుకుంటున్నాను', Opts=['నేను', 'తెలుగు', 'Morning Chai', 'నేర్చుకుంటున్నాను']
+  Ex ID 5254: Type=multiple_choice, Q='[Morning Chai] Translate 'Thank you' in Telugu:', Ans='ధన్యవాదాలు', Opts=['ధన్యవాదాలు', 'నమస్కారం']
+
+=== Lesson ID 551: Left & Right ===
+Total Exercises: 10
+  Ex ID 5501: Type=multiple_choice, Q='[Left & Right] What is the Telugu phrase for 'Left & Right'?', Ans='నమస్కారం (Left & Right)', Opts=['నమస్కారం (Left & Right)', 'ధన్యవాదాలు']
+  Ex ID 5502: Type=fill_blank, Q='[Left & Right] Complete: Naaku ______ (Left & Right) chala ishtam.', Ans='Left & Right', Opts=[]
+  Ex ID 5503: Type=word_bank, Q='[Left & Right] Arrange: 'Nenu Telugu Left & Right nerchukuntunnanu'', Ans='నేను తెలుగు Left & Right నేర్చుకుంటున్నాను', Opts=['నేను', 'తెలుగు', 'Left & Right', 'నేర్చుకుంటున్నాను']
+  Ex ID 5504: Type=multiple_choice, Q='[Left & Right] Translate 'Thank you' in Telugu:', Ans='ధన్యవాదాలు', Opts=['ధన్యవాదాలు', 'నమస్కారం']
+
+=== Lesson ID 576: Ask Price ===
+Total Exercises: 10
+  Ex ID 5751: Type=multiple_choice, Q='[Ask Price] What is the Telugu phrase for 'Ask Price'?', Ans='నమస్కారం (Ask Price)', Opts=['నమస్కారం (Ask Price)', 'ధన్యవాదాలు']
+  Ex ID 5752: Type=fill_blank, Q='[Ask Price] Complete: Naaku ______ (Ask Price) chala ishtam.', Ans='Ask Price', Opts=[]
+  Ex ID 5753: Type=word_bank, Q='[Ask Price] Arrange: 'Nenu Telugu Ask Price nerchukuntunnanu'', Ans='నేను తెలుగు Ask Price నేర్చుకుంటున్నాను', Opts=['నేను', 'తెలుగు', 'Ask Price', 'నేర్చుకుంటున్నాను']
+  Ex ID 5754: Type=multiple_choice, Q='[Ask Price] Translate 'Thank you' in Telugu:', Ans='ధన్యవాదాలు', Opts=['ధన్యవాదాలు', 'నమస్కారం']
+
+=== Lesson ID 601: Poetry & Verses ===
+Total Exercises: 10
+  Ex ID 6001: Type=multiple_choice, Q='[Poetry & Verses] What is the Telugu phrase for 'Poetry & Verses'?', Ans='నమస్కారం (Poetry & Verses)', Opts=['నమస్కారం (Poetry & Verses)', 'ధన్యవాదాలు']
+  Ex ID 6002: Type=fill_blank, Q='[Poetry & Verses] Complete: Naaku ______ (Poetry & Verses) chala ishtam.', Ans='Poetry & Verses', Opts=[]
+  Ex ID 6003: Type=word_bank, Q='[Poetry & Verses] Arrange: 'Nenu Telugu Poetry & Verses nerchukuntunnanu'', Ans='నేను తెలుగు Poetry & Verses నేర్చుకుంటున్నాను', Opts=['నేను', 'తెలుగు', 'Poetry & Verses', 'నేర్చుకుంటున్నాను']
+  Ex ID 6004: Type=multiple_choice, Q='[Poetry & Verses] Translate 'Thank you' in Telugu:', Ans='ధన్యవాదాలు', Opts=['ధన్యవాదాలు', 'నమస్కారం']
+

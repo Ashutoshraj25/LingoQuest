@@ -2,18 +2,27 @@ import React from "react";
 import { clsx } from "clsx";
 
 interface ProgressBarProps {
-  progress: number; // 0 to 100
+  progress?: number; // 0 to 100
+  value?: number;
+  max?: number;
   color?: "green" | "blue" | "orange" | "yellow";
+  colorHex?: string;
   height?: string;
   className?: string;
 }
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   progress,
-  color = "green",
-  height = "h-4",
+  value = 45,
+  max = 100,
+  color = "blue",
+  colorHex,
+  height = "h-3",
   className,
 }) => {
+  const percentage = progress !== undefined ? progress : Math.round((value / max) * 100);
+  const clampedProgress = Math.min(100, Math.max(0, percentage));
+
   const colorMap = {
     green: "bg-duo-green",
     blue: "bg-duo-blue",
@@ -21,17 +30,21 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     yellow: "bg-duo-yellow",
   };
 
-  const clampedProgress = Math.min(100, Math.max(0, progress));
-
   return (
-    <div className={clsx("w-full bg-gray-200 dark:bg-slate-800 rounded-full overflow-hidden relative", height, className)}>
+    <div
+      className={clsx(
+        "w-full bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden border border-gray-300 dark:border-slate-600",
+        height,
+        className
+      )}
+    >
       <div
-        className={clsx("h-full transition-all duration-500 ease-out rounded-full relative", colorMap[color])}
-        style={{ width: `${clampedProgress}%` }}
-      >
-        {/* Shine highlight */}
-        <div className="absolute top-0 left-0 right-0 h-1/3 bg-white opacity-30 rounded-full" />
-      </div>
+        className={clsx("h-full transition-all duration-500 rounded-full", !colorHex && colorMap[color])}
+        style={{
+          width: `${clampedProgress}%`,
+          backgroundColor: colorHex || undefined,
+        }}
+      />
     </div>
   );
 };

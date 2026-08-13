@@ -1,26 +1,47 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.models.models import User, Course, Unit, Skill, UserProgress
 from app.schemas.schemas import DashboardResponse, UnitSchema, SkillSchema, UserResponse
+from app.api.auth import get_user_from_req
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 @router.get("", response_model=DashboardResponse)
-def get_dashboard(user_id: int = 1, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.id == user_id).first()
+def get_dashboard(request: Request, user_id: int = 1, db: Session = Depends(get_db)):
+    user = get_user_from_req(request, db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    course_id = user.current_course_id or 1
-    course = db.query(Course).filter(Course.id == course_id).first()
+    # Load course matching current_course_id or language_to_learn
+    course = None
+    if user.current_course_id:
+        course = db.query(Course).filter(Course.id == user.current_course_id).first()
+    
+    if not course and user.language_to_learn:
+        course = db.query(Course).filter(
+            (Course.title.ilike(f"%{user.language_to_learn}%")) | (Course.code.ilike(user.language_to_learn))
+        ).first()
+
+    if not course:
+        course = db.query(Course).first()
+
+    # Sync user's current_course_id and language_to_learn
+    if course:
+        if user.current_course_id != course.id or user.language_to_learn != course.title:
+            user.current_course_id = course.id
+            user.language_to_learn = course.title
+            db.commit()
+            db.refresh(user)
 
     units_data = []
     if course:
         units = db.query(Unit).filter(Unit.course_id == course.id).order_by(Unit.order).all()
+        
         for unit in units:
             skills = db.query(Skill).filter(Skill.unit_id == unit.id).order_by(Skill.order).all()
             skills_data = []
+            
             for skill in skills:
                 prog = db.query(UserProgress).filter(
                     UserProgress.user_id == user.id,
@@ -28,8 +49,10 @@ def get_dashboard(user_id: int = 1, db: Session = Depends(get_db)):
                 ).first()
                 
                 completed_lessons = prog.completed_lessons if prog else 0
-                is_unlocked = prog.is_unlocked if prog else (skill.order == 1 and unit.order == 1)
                 is_completed = prog.is_completed if prog else False
+                
+                # ALL UNITS & SKILLS ARE UNLOCKED ACROSS ALL 5 UNITS!
+                is_unlocked = True
 
                 skills_data.append(SkillSchema(
                     id=skill.id,

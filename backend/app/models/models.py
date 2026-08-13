@@ -31,7 +31,7 @@ class User(Base):
     dark_mode = Column(Boolean, default=False)
     sound_effects = Column(Boolean, default=True)
     haptic_feedback = Column(Boolean, default=True)
-    current_course_id = Column(Integer, nullable=True)
+    current_course_id = Column(Integer, nullable=True, default=1)
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime, default=datetime.utcnow)
 
@@ -126,6 +126,7 @@ class UserProgress(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    course_id = Column(Integer, ForeignKey("courses.id"), nullable=True)
     skill_id = Column(Integer, ForeignKey("skills.id"), nullable=False)
     completed_lessons = Column(Integer, default=0)
     is_unlocked = Column(Boolean, default=True)

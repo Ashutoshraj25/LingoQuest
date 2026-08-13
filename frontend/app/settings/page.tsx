@@ -1,17 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar } from "@/components/ui/Sidebar";
 import { Navbar } from "@/components/ui/Navbar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Settings, Moon, Volume2, Bell, Shield, LogOut } from "lucide-react";
+import { Settings, Moon, Volume2, Bell, Shield, Globe, Check } from "lucide-react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+
+const INDIAN_LANGUAGES = [
+  { code: "hi", name: "Hindi", flag: "🇮🇳", native: "हिन्दी" },
+  { code: "mr", name: "Marathi", flag: "🇮🇳", native: "मराठी" },
+  { code: "bn", name: "Bengali", flag: "🇮🇳", native: "বাংলা" },
+  { code: "ta", name: "Tamil", flag: "🇮🇳", native: "தமிழ்" },
+  { code: "te", name: "Telugu", flag: "🇮🇳", native: "తెలుగు" },
+];
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [sound, setSound] = useState(true);
   const [notifications, setNotifications] = useState(true);
+  const [selectedLanguage, setSelectedLanguage] = useState("Hindi");
+  const [isUpdatingLang, setIsUpdatingLang] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+
+  useEffect(() => {
+    if (user?.language_to_learn) {
+      setSelectedLanguage(user.language_to_learn);
+    }
+  }, [user]);
 
   const toggleDarkMode = () => {
     const next = !darkMode;
@@ -21,6 +40,25 @@ export default function SettingsPage() {
     } else {
       document.documentElement.classList.remove("dark");
     }
+  };
+
+  const handleLanguageChange = (langName: string) => {
+    setSelectedLanguage(langName);
+    setIsUpdatingLang(true);
+    setSuccessMsg("");
+
+    api.switchLanguage(langName)
+      .then((updatedUser) => {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        }
+        setSuccessMsg(`Active target language updated to ${langName}!`);
+        setTimeout(() => setSuccessMsg(""), 3000);
+      })
+      .catch((err) => {
+        console.error("Language change failed:", err);
+      })
+      .finally(() => setIsUpdatingLang(false));
   };
 
   return (
@@ -34,11 +72,60 @@ export default function SettingsPage() {
             Settings
           </h1>
           <p className="text-gray-500 font-semibold text-sm">
-            Manage your preferences, appearance, and audio experience.
+            Manage your preferences, learning language, and application appearance.
           </p>
         </div>
 
         <div className="space-y-6">
+          {/* Target Learning Language Selection */}
+          <Card className="p-6 border-2 border-duo-green/30">
+            <div className="flex items-center gap-3 mb-4">
+              <Globe className="w-6 h-6 text-duo-green" />
+              <div>
+                <h3 className="text-xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100">
+                  Target Learning Language
+                </h3>
+                <p className="text-xs text-gray-400 font-semibold">
+                  Switch your learning language anytime. Your progress will be saved independently per language.
+                </p>
+              </div>
+            </div>
+
+            {successMsg && (
+              <div className="mb-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-duo-green text-xs font-extrabold text-duo-green flex items-center gap-2">
+                <Check className="w-4 h-4" />
+                <span>{successMsg}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {INDIAN_LANGUAGES.map((lang) => {
+                const isSelected = selectedLanguage.toLowerCase() === lang.name.toLowerCase();
+                return (
+                  <button
+                    key={lang.code}
+                    disabled={isUpdatingLang}
+                    onClick={() => handleLanguageChange(lang.name)}
+                    className={`flex items-center justify-between p-3.5 rounded-2xl border-2 font-extrabold text-sm transition-all text-left ${
+                      isSelected
+                        ? "border-duo-green bg-emerald-50/50 dark:bg-emerald-950/30 text-duo-green"
+                        : "border-gray-200 dark:border-slate-800 text-gray-700 dark:text-slate-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{lang.flag}</span>
+                      <div>
+                        <div>{lang.name}</div>
+                        <div className="text-xs text-gray-400 font-bold">{lang.native}</div>
+                      </div>
+                    </div>
+                    {isSelected && <Check className="w-5 h-5 text-duo-green" />}
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+
           {/* Preferences */}
           <Card className="p-6">
             <h3 className="text-xl font-extrabold font-['Fredoka'] mb-4 text-gray-800 dark:text-slate-100">
@@ -59,24 +146,24 @@ export default function SettingsPage() {
                   type="checkbox"
                   checked={darkMode}
                   onChange={toggleDarkMode}
-                  className="w-6 h-6 rounded border-gray-300 text-duo-blue focus:ring-duo-blue cursor-pointer"
+                  className="w-5 h-5 accent-duo-green rounded cursor-pointer"
                 />
               </div>
 
-              {/* Sound FX */}
+              {/* Sound Effects */}
               <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-slate-800">
                 <div className="flex items-center gap-3">
-                  <Volume2 className="w-5 h-5 text-duo-green" />
+                  <Volume2 className="w-5 h-5 text-duo-blue" />
                   <div>
-                    <span className="font-bold text-gray-800 dark:text-slate-100">Sound FX</span>
-                    <p className="text-xs text-gray-400 font-semibold">Play audio cues for correct/incorrect answers</p>
+                    <span className="font-bold text-gray-800 dark:text-slate-100">Sound Effects</span>
+                    <p className="text-xs text-gray-400 font-semibold">Play audio on correct/incorrect answers</p>
                   </div>
                 </div>
                 <input
                   type="checkbox"
                   checked={sound}
                   onChange={() => setSound(!sound)}
-                  className="w-6 h-6 rounded border-gray-300 text-duo-blue focus:ring-duo-blue cursor-pointer"
+                  className="w-5 h-5 accent-duo-green rounded cursor-pointer"
                 />
               </div>
 
@@ -85,30 +172,17 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <Bell className="w-5 h-5 text-duo-orange" />
                   <div>
-                    <span className="font-bold text-gray-800 dark:text-slate-100">Streak Reminders</span>
-                    <p className="text-xs text-gray-400 font-semibold">Receive daily practice notifications</p>
+                    <span className="font-bold text-gray-800 dark:text-slate-100">Daily Reminders</span>
+                    <p className="text-xs text-gray-400 font-semibold">Get notified to keep your streak alive</p>
                   </div>
                 </div>
                 <input
                   type="checkbox"
                   checked={notifications}
                   onChange={() => setNotifications(!notifications)}
-                  className="w-6 h-6 rounded border-gray-300 text-duo-blue focus:ring-duo-blue cursor-pointer"
+                  className="w-5 h-5 accent-duo-green rounded cursor-pointer"
                 />
               </div>
-            </div>
-          </Card>
-
-          {/* Danger zone / Logout */}
-          <Card className="p-6 border-rose-200 dark:border-rose-950">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-extrabold text-base text-rose-600 font-['Fredoka']">Account Session</h4>
-                <p className="text-xs text-gray-400 font-semibold">Log out of your current session</p>
-              </div>
-              <Button variant="red" size="sm">
-                <LogOut className="w-4 h-4 mr-2 inline" /> LOG OUT
-              </Button>
             </div>
           </Card>
         </div>

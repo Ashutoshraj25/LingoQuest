@@ -34,20 +34,18 @@ export const api = {
   googleLogin: (data: { email: string; full_name: string; google_id: string; avatar_url?: string }) => 
     fetchApi("/auth/google", { method: "POST", body: JSON.stringify(data) }),
 
-  guestLogin: () => 
-    fetchApi("/auth/register", {
+  switchLanguage: (language: string) => {
+    const userStr = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    const user = userStr ? JSON.parse(userStr) : null;
+    const userId = user?.id || 1;
+    return fetchApi(`/auth/select-language?user_id=${userId}`, {
       method: "POST",
-      body: JSON.stringify({
-        full_name: "Ashutosh Raj",
-        username: "ashutosh_raj",
-        email: "ashutosh@example.com",
-        password: "password123",
-        confirm_password: "password123",
-        native_language: "English",
-        language_to_learn: "Hindi",
-        country: "India"
-      })
-    }),
+      body: JSON.stringify({ language })
+    });
+  },
+
+  guestLogin: () => 
+    fetchApi("/auth/guest", { method: "POST" }),
 
   logout: () =>
     fetchApi("/auth/logout", { method: "POST" }),
@@ -61,8 +59,12 @@ export const api = {
   resetPassword: (data: { email: string; new_password: string }) =>
     fetchApi("/auth/reset-password", { method: "POST", body: JSON.stringify(data) }),
 
-  getDashboard: (userId: number = 1) => 
-    fetchApi(`/dashboard/?user_id=${userId}`),
+  getDashboard: (userId?: number) => {
+    const userStr = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    const user = userStr ? JSON.parse(userStr) : null;
+    const uid = userId || user?.id || 1;
+    return fetchApi(`/dashboard/?user_id=${uid}`);
+  },
   
   getLanguages: () => 
     fetchApi("/lessons/languages"),

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Mascot } from "@/components/ui/Mascot";
 import { api } from "@/lib/api";
 import { getPostAuthRedirect, getStoredToken, persistAuthSession } from "@/lib/auth";
+import { Zap } from "lucide-react";
 
 const INDIAN_LANGUAGES = ["Hindi", "English", "Bengali", "Tamil", "Telugu", "Marathi", "Kannada", "Malayalam", "Gujarati", "Punjabi"];
 const COUNTRIES = ["India", "United States", "United Kingdom", "Canada", "Australia", "UAE", "Singapore"];
@@ -82,6 +83,19 @@ export default function RegisterPage() {
     setRedirectTo(nextRedirect);
   }, [router]);
 
+  const handleGuestSignIn = async () => {
+    setLoading(true);
+    try {
+      const response = await api.guestLogin();
+      persistAuthSession(response.access_token, response.user);
+      router.push(redirectTo);
+    } catch (error) {
+      setFormError("Guest login failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onSubmit = handleSubmit(async (values) => {
     setFormError(null);
     const parsed = registerSchema.safeParse(values);
@@ -136,6 +150,22 @@ export default function RegisterPage() {
             </div>
           )}
 
+          {/* Instant Guest Login Button */}
+          <button
+            type="button"
+            onClick={handleGuestSignIn}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-duo-green hover:bg-emerald-600 text-white font-black text-sm transition-all mb-4 shadow-md shadow-duo-green/20"
+          >
+            <Zap className="w-5 h-5 fill-yellow-300 text-yellow-300 animate-bounce" />
+            <span>CONTINUE AS GUEST (FAST LOG IN)</span>
+          </button>
+
+          <div className="relative my-4 text-center">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200 dark:border-slate-700" /></div>
+            <span className="relative bg-white dark:bg-slate-900 px-3 text-xs font-bold text-gray-400 uppercase">OR FILL REGISTRATION DETAILS</span>
+          </div>
+
           <form onSubmit={onSubmit} className="space-y-4" noValidate>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -159,7 +189,7 @@ export default function RegisterPage() {
                 <input
                   id="username"
                   type="text"
-                  placeholder="e.g. ashutosh_raj"
+                  placeholder="ashutosh_raj"
                   className="w-full p-3 font-bold bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:border-duo-blue outline-none dark:text-slate-100"
                   {...register("username")}
                 />
@@ -174,7 +204,7 @@ export default function RegisterPage() {
               <input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="ashutosh@example.com"
                 className="w-full p-3 font-bold bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:border-duo-blue outline-none dark:text-slate-100"
                 {...register("email")}
               />
@@ -189,7 +219,7 @@ export default function RegisterPage() {
                 <input
                   id="password"
                   type="password"
-                  placeholder="Create a password"
+                  placeholder="••••••••"
                   className="w-full p-3 font-bold bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:border-duo-blue outline-none dark:text-slate-100"
                   {...register("password")}
                 />
@@ -203,18 +233,20 @@ export default function RegisterPage() {
                 <input
                   id="confirm_password"
                   type="password"
-                  placeholder="Re-enter your password"
+                  placeholder="••••••••"
                   className="w-full p-3 font-bold bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:border-duo-blue outline-none dark:text-slate-100"
                   {...register("confirm_password")}
                 />
-                {errors.confirm_password && <p className="mt-1 text-xs font-bold text-rose-600">{errors.confirm_password.message}</p>}
+                {errors.confirm_password && (
+                  <p className="mt-1 text-xs font-bold text-rose-600">{errors.confirm_password.message}</p>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label htmlFor="native_language" className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                  Native Language
+                  I Speak
                 </label>
                 <select
                   id="native_language"
@@ -227,12 +259,11 @@ export default function RegisterPage() {
                     </option>
                   ))}
                 </select>
-                {errors.native_language && <p className="mt-1 text-xs font-bold text-rose-600">{errors.native_language.message}</p>}
               </div>
 
               <div>
                 <label htmlFor="language_to_learn" className="block text-xs font-bold uppercase text-gray-500 mb-1">
-                  Language to Learn
+                  I Want to Learn
                 </label>
                 <select
                   id="language_to_learn"
@@ -245,7 +276,9 @@ export default function RegisterPage() {
                     </option>
                   ))}
                 </select>
-                {errors.language_to_learn && <p className="mt-1 text-xs font-bold text-rose-600">{errors.language_to_learn.message}</p>}
+                {errors.language_to_learn && (
+                  <p className="mt-1 text-xs font-bold text-rose-600">{errors.language_to_learn.message}</p>
+                )}
               </div>
 
               <div>
@@ -257,24 +290,23 @@ export default function RegisterPage() {
                   className="w-full p-3 font-bold bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:border-duo-blue outline-none dark:text-slate-100"
                   {...register("country")}
                 >
-                  {COUNTRIES.map((country) => (
-                    <option key={country} value={country}>
-                      {country}
+                  {COUNTRIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
                     </option>
                   ))}
                 </select>
-                {errors.country && <p className="mt-1 text-xs font-bold text-rose-600">{errors.country.message}</p>}
               </div>
             </div>
 
-            <Button variant="green" size="full" type="submit" className="mt-4" disabled={loading}>
+            <Button variant="green" size="full" type="submit" disabled={loading} className="mt-4">
               {loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
             </Button>
           </form>
 
           <p className="text-center text-xs font-bold text-gray-400 mt-6">
             Already have an account?{" "}
-            <Link href={`/auth/login?redirectTo=${encodeURIComponent(redirectTo)}`} className="text-duo-blue hover:underline">
+            <Link href="/auth/login" className="text-duo-blue hover:underline">
               LOG IN
             </Link>
           </p>
