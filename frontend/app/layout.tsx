@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "LingoQuest - The Gamified Language Learning Platform",
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body className="bg-white dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 antialiased">
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
