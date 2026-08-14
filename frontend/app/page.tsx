@@ -109,8 +109,11 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
+    <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
+      {/* 1. Left Sidebar (Fixed) */}
       <Sidebar />
+
+      {/* 2. Top Header (Sticky/Fixed) */}
       <Navbar user={user} onLanguageChange={() => fetchDashboard(user.id)} />
 
       <FirstLanguageModal
@@ -118,9 +121,10 @@ export default function DashboardPage() {
         onSelectLanguage={handleLanguageModalSelect}
       />
 
-      <main className="lg:pl-64 pt-16 flex flex-col lg:flex-row max-w-full overflow-x-hidden">
-        {/* Central Learning Path */}
-        <div className="flex-1 max-w-2xl mx-auto px-4 py-8">
+      {/* 3. Main 3-Column Container */}
+      <div className="lg:pl-64 pt-16 h-screen w-full flex flex-col lg:flex-row overflow-hidden">
+        {/* Central Learning Path - INDEPENDENTLY SCROLLABLE */}
+        <main className="flex-1 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar scroll-smooth max-w-2xl mx-auto px-4 py-8">
           {units.map((unit: any) => (
             <div key={unit.id} className="mb-12">
               <UnitHeader
@@ -150,10 +154,10 @@ export default function DashboardPage() {
               </div>
             </div>
           ))}
-        </div>
+        </main>
 
-        {/* Right Sidebar Widget */}
-        <div className="w-full lg:w-80 p-6 space-y-6">
+        {/* Right Sidebar Widget - FIXED ON DESKTOP */}
+        <aside className="w-full lg:w-80 h-auto lg:h-[calc(100vh-4rem)] lg:overflow-y-auto no-scrollbar p-6 space-y-6 shrink-0 border-l border-transparent lg:border-gray-100 dark:lg:border-slate-800">
           <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 bg-sky-50/50 dark:bg-slate-800/50 space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-duo-blue/10 flex items-center justify-center text-duo-blue font-black text-xl">
@@ -222,8 +226,8 @@ export default function DashboardPage() {
               </div>
             </div>
           </Card>
-        </div>
-      </main>
+        </aside>
+      </div>
     </div>
   );
 }

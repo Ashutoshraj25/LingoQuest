@@ -42,11 +42,11 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
+    <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
       <Sidebar />
       <Navbar user={{ streak: 5, xp: 450, hearts: 5, gems: userGems, avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Alex" }} />
 
-      <main className="lg:pl-64 pt-16 max-w-4xl mx-auto p-4 sm:p-6 overflow-x-hidden">
+      <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
         {/* Shop Banner */}
         <div className="mb-8 p-6 bg-gradient-to-r from-duo-purple to-purple-600 rounded-3xl text-white shadow-lg flex items-center justify-between">
           <div>

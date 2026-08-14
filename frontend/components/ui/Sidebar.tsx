@@ -33,7 +33,7 @@ export const Sidebar: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 fixed left-0 top-0 bottom-0 bg-white dark:bg-slate-900 border-r-2 border-gray-200 dark:border-slate-800 p-4 flex flex-col justify-between z-40 hidden lg:flex">
+    <aside className="w-64 fixed left-0 top-0 bottom-0 h-screen bg-white dark:bg-slate-900 border-r-2 border-gray-200 dark:border-slate-800 p-4 flex flex-col justify-between z-40 hidden lg:flex overflow-y-auto no-scrollbar select-none">
       <div>
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3 px-3 py-4 mb-6">

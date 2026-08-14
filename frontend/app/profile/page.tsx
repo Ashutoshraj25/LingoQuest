@@ -44,11 +44,11 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
+    <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
       <Sidebar />
       <Navbar user={user} />
 
-      <main className="lg:pl-64 pt-16 max-w-4xl mx-auto p-4 sm:p-6 overflow-x-hidden">
+      <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
         {/* User Profile Header Card */}
         <Card className="mb-8 p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">

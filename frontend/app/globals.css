@@ -21,6 +21,15 @@ body {
   background-color: #131f24;
 }
 
+/* Hide scrollbar for Chrome, Safari, Edge, Firefox */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Gamified 3D Button Depth FX */
 .btn-duo-green {
   background-color: #58CC02;
