@@ -118,7 +118,7 @@ export default function DashboardPage() {
         onSelectLanguage={handleLanguageModalSelect}
       />
 
-      <main className="md:pl-64 pt-16 flex flex-col lg:flex-row">
+      <main className="lg:pl-64 pt-16 flex flex-col lg:flex-row max-w-full overflow-x-hidden">
         {/* Central Learning Path */}
         <div className="flex-1 max-w-2xl mx-auto px-4 py-8">
           {units.map((unit: any) => (

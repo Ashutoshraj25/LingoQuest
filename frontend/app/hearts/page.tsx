@@ -30,7 +30,7 @@ export default function HeartsPage() {
       <Sidebar />
       <Navbar user={{ streak: 5, xp: 450, hearts, gems: 1200, avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Alex" }} />
 
-      <main className="md:pl-64 pt-16 max-w-2xl mx-auto p-6 text-center">
+      <main className="lg:pl-64 pt-16 max-w-2xl mx-auto p-4 sm:p-6 text-center overflow-x-hidden">
         <Mascot mood={hearts === 0 ? "sad" : "happy"} size={140} speechBubble={hearts === 0 ? "Oh no! You're out of hearts!" : "Keep your hearts full so you never stop learning!"} />
 
         <h1 className="text-3xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100 my-4">

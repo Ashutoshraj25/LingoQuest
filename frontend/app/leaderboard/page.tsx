@@ -38,7 +38,7 @@ export default function LeaderboardPage() {
       <Sidebar />
       <Navbar />
 
-      <main className="md:pl-64 pt-16 max-w-4xl mx-auto p-6">
+      <main className="lg:pl-64 pt-16 max-w-4xl mx-auto p-4 sm:p-6 overflow-x-hidden">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100 mb-1">
