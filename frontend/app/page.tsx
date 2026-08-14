@@ -10,10 +10,87 @@ import { LessonNode } from "@/features/learning-path/LessonNode";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { Flame, Trophy, Sparkles, Dumbbell } from "lucide-react";
+import { Trophy, Dumbbell } from "lucide-react";
 import { api } from "@/lib/api";
 import { clearAuthSession, getStoredToken, getStoredUser } from "@/lib/auth";
 import { FirstLanguageModal } from "@/components/auth/FirstLanguageModal";
+
+// Shared Right Panel Widgets Component
+const RightPanelWidgets = ({ user }: { user: any }) => (
+  <>
+    {/* Language Progress Card */}
+    <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 bg-sky-50/50 dark:bg-slate-800/50 space-y-3">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-duo-blue/10 flex items-center justify-center text-duo-blue font-black text-xl">
+          🇮🇳
+        </div>
+        <div>
+          <h3 className="font-extrabold text-sm text-gray-800 dark:text-slate-100">
+            {user.language_to_learn || "Hindi"} Course
+          </h3>
+          <p className="text-xs font-bold text-gray-400">
+            Active Learning Path
+          </p>
+        </div>
+      </div>
+      <ProgressBar value={45} max={100} colorHex="#1CB0F6" height="h-2.5" />
+      <div className="flex justify-between items-center text-xs font-extrabold text-gray-500">
+        <span>Path Progress</span>
+        <span>45%</span>
+      </div>
+    </Card>
+
+    {/* Daily Practice Card */}
+    <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 font-extrabold text-gray-800 dark:text-slate-100">
+          <Dumbbell className="w-5 h-5 text-duo-purple" />
+          <span>Daily Practice</span>
+        </div>
+        <span className="text-xs font-extrabold text-duo-purple bg-duo-purple/10 px-2.5 py-1 rounded-full uppercase">
+          +15 XP
+        </span>
+      </div>
+      <p className="text-xs font-semibold text-gray-500 dark:text-slate-400">
+        Strengthen your {user.language_to_learn || "Hindi"} vocabulary and grammar skills.
+      </p>
+      <Link href="/practice">
+        <Button variant="purple" className="w-full text-xs py-2.5 uppercase font-black tracking-wide">
+          Start Practice Mode
+        </Button>
+      </Link>
+    </Card>
+
+    {/* Leaderboard Preview Card */}
+    <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 font-extrabold text-gray-800 dark:text-slate-100">
+          <Trophy className="w-5 h-5 text-duo-yellow" />
+          <span>Gold League</span>
+        </div>
+        <Link href="/leaderboard" className="text-xs font-extrabold text-duo-blue hover:underline">
+          View All
+        </Link>
+      </div>
+      <div className="space-y-2 pt-1">
+        <div className="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-slate-800/80 text-xs font-bold">
+          <div className="flex items-center gap-2">
+            <span className="font-black text-duo-yellow">#1</span>
+            <span>Aarav Sharma</span>
+          </div>
+          <span className="font-extrabold text-gray-500">5,100 XP</span>
+        </div>
+        <div className="flex items-center justify-between p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-duo-green text-xs font-bold">
+          <div className="flex items-center gap-2">
+            <span className="font-black text-duo-green">#2</span>
+            <span className="text-duo-green font-extrabold">You (Ashutosh)</span>
+          </div>
+          <span className="font-extrabold text-duo-green">4,250 XP</span>
+        </div>
+      </div>
+    </Card>
+  </>
+);
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -110,7 +187,7 @@ export default function DashboardPage() {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
-      {/* 1. Left Sidebar (Fixed) */}
+      {/* 1. Left Sidebar (Fixed on Desktop) */}
       <Sidebar />
 
       {/* 2. Top Header (Sticky/Fixed) */}
@@ -121,7 +198,7 @@ export default function DashboardPage() {
         onSelectLanguage={handleLanguageModalSelect}
       />
 
-      {/* 3. Main 3-Column Container */}
+      {/* 3. Main Container */}
       <div className="lg:pl-64 pt-16 h-screen w-full flex flex-col lg:flex-row overflow-hidden">
         {/* Central Learning Path - INDEPENDENTLY SCROLLABLE */}
         <main className="flex-1 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar scroll-smooth max-w-2xl mx-auto px-4 py-8">
@@ -154,78 +231,19 @@ export default function DashboardPage() {
               </div>
             </div>
           ))}
+
+          {/* MOBILE & TABLET RIGHT PANEL (<1024px) - STACKED BELOW LEARNING PATH */}
+          <div className="lg:hidden mt-12 space-y-6 pt-8 border-t-2 border-gray-100 dark:border-slate-800 pb-16 w-full">
+            <h3 className="font-extrabold text-lg text-gray-800 dark:text-slate-100 font-['Fredoka']">
+              Your Progress & Daily Practice
+            </h3>
+            <RightPanelWidgets user={user} />
+          </div>
         </main>
 
-        {/* Right Sidebar Widget - FIXED ON DESKTOP */}
-        <aside className="w-full lg:w-80 h-auto lg:h-[calc(100vh-4rem)] lg:overflow-y-auto no-scrollbar p-6 space-y-6 shrink-0 border-l border-transparent lg:border-gray-100 dark:lg:border-slate-800">
-          <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 bg-sky-50/50 dark:bg-slate-800/50 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-duo-blue/10 flex items-center justify-center text-duo-blue font-black text-xl">
-                🇮🇳
-              </div>
-              <div>
-                <h3 className="font-extrabold text-sm text-gray-800 dark:text-slate-100">
-                  {user.language_to_learn || "Hindi"} Course
-                </h3>
-                <p className="text-xs font-bold text-gray-400">
-                  Active Learning Path
-                </p>
-              </div>
-            </div>
-            <ProgressBar value={45} max={100} colorHex="#1CB0F6" height="h-2.5" />
-            <div className="flex justify-between items-center text-xs font-extrabold text-gray-500">
-              <span>Path Progress</span>
-              <span>45%</span>
-            </div>
-          </Card>
-
-          <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 font-extrabold text-gray-800 dark:text-slate-100">
-                <Dumbbell className="w-5 h-5 text-duo-purple" />
-                <span>Daily Practice</span>
-              </div>
-              <span className="text-xs font-extrabold text-duo-purple bg-duo-purple/10 px-2.5 py-1 rounded-full uppercase">
-                +15 XP
-              </span>
-            </div>
-            <p className="text-xs font-semibold text-gray-500 dark:text-slate-400">
-              Strengthen your {user.language_to_learn || "Hindi"} vocabulary and grammar skills.
-            </p>
-            <Link href="/practice">
-              <Button variant="purple" className="w-full text-xs py-2.5 uppercase font-black tracking-wide">
-                Start Practice Mode
-              </Button>
-            </Link>
-          </Card>
-
-          <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 font-extrabold text-gray-800 dark:text-slate-100">
-                <Trophy className="w-5 h-5 text-duo-yellow" />
-                <span>Gold League</span>
-              </div>
-              <Link href="/leaderboard" className="text-xs font-extrabold text-duo-blue hover:underline">
-                View All
-              </Link>
-            </div>
-            <div className="space-y-2 pt-1">
-              <div className="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-slate-800/80 text-xs font-bold">
-                <div className="flex items-center gap-2">
-                  <span className="font-black text-duo-yellow">#1</span>
-                  <span>Aarav Sharma</span>
-                </div>
-                <span className="font-extrabold text-gray-500">5,100 XP</span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-duo-green text-xs font-bold">
-                <div className="flex items-center gap-2">
-                  <span className="font-black text-duo-green">#2</span>
-                  <span className="text-duo-green font-extrabold">You (Ashutosh)</span>
-                </div>
-                <span className="font-extrabold text-duo-green">4,250 XP</span>
-              </div>
-            </div>
-          </Card>
+        {/* DESKTOP RIGHT SIDEBAR WIDGET (>=1024px) - FIXED ON DESKTOP */}
+        <aside className="hidden lg:block w-80 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar p-6 space-y-6 shrink-0 border-l border-gray-100 dark:border-slate-800">
+          <RightPanelWidgets user={user} />
         </aside>
       </div>
     </div>
