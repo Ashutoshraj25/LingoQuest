@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Settings, Moon, Volume2, Bell, Shield, Globe, Check } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const INDIAN_LANGUAGES = [
   { code: "hi", name: "Hindi", flag: "🇮🇳", native: "हिन्दी" },
@@ -19,7 +20,6 @@ const INDIAN_LANGUAGES = [
 
 export default function SettingsPage() {
   const { user } = useAuth();
-  const [darkMode, setDarkMode] = useState(false);
   const [sound, setSound] = useState(true);
   const [notifications, setNotifications] = useState(true);
   const [selectedLanguage, setSelectedLanguage] = useState("Hindi");
@@ -32,31 +32,19 @@ export default function SettingsPage() {
     }
   }, [user]);
 
-  const toggleDarkMode = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    if (next) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  };
-
   const handleLanguageChange = (langName: string) => {
-    setSelectedLanguage(langName);
     setIsUpdatingLang(true);
-    setSuccessMsg("");
-
+    setSelectedLanguage(langName);
     api.switchLanguage(langName)
       .then((updatedUser) => {
         if (typeof window !== "undefined") {
           localStorage.setItem("user", JSON.stringify(updatedUser));
         }
-        setSuccessMsg(`Active target language updated to ${langName}!`);
-        setTimeout(() => setSuccessMsg(""), 3000);
+        setSuccessMsg(`Active learning language set to ${langName}!`);
+        setTimeout(() => setSuccessMsg(""), 3500);
       })
       .catch((err) => {
-        console.error("Language change failed:", err);
+        console.error("Language update error:", err);
       })
       .finally(() => setIsUpdatingLang(false));
   };
@@ -76,27 +64,27 @@ export default function SettingsPage() {
           </p>
         </div>
 
+        {successMsg && (
+          <div className="mb-6 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-duo-green text-duo-green font-extrabold text-sm flex items-center gap-3">
+            <Check className="w-5 h-5" />
+            <span>{successMsg}</span>
+          </div>
+        )}
+
         <div className="space-y-6">
-          {/* Target Learning Language Selection */}
-          <Card className="p-6 border-2 border-duo-green/30">
+          {/* Active Learning Language */}
+          <Card className="p-6">
             <div className="flex items-center gap-3 mb-4">
-              <Globe className="w-6 h-6 text-duo-green" />
+              <Globe className="w-6 h-6 text-duo-blue" />
               <div>
                 <h3 className="text-xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100">
-                  Target Learning Language
+                  Target Language
                 </h3>
                 <p className="text-xs text-gray-400 font-semibold">
-                  Switch your learning language anytime. Your progress will be saved independently per language.
+                  Choose the Indian language you are currently practicing
                 </p>
               </div>
             </div>
-
-            {successMsg && (
-              <div className="mb-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-duo-green text-xs font-extrabold text-duo-green flex items-center gap-2">
-                <Check className="w-4 h-4" />
-                <span>{successMsg}</span>
-              </div>
-            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {INDIAN_LANGUAGES.map((lang) => {
@@ -133,21 +121,16 @@ export default function SettingsPage() {
             </h3>
 
             <div className="space-y-4">
-              {/* Dark Mode */}
+              {/* Dark Mode Animated Toggle */}
               <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                   <Moon className="w-5 h-5 text-duo-purple" />
                   <div>
-                    <span className="font-bold text-gray-800 dark:text-slate-100">Dark Mode</span>
-                    <p className="text-xs text-gray-400 font-semibold">Switch to dark theme for night study</p>
+                    <span className="font-bold text-gray-800 dark:text-slate-100">Theme Appearance</span>
+                    <p className="text-xs text-gray-400 font-semibold">Switch between light and dark mode</p>
                   </div>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={darkMode}
-                  onChange={toggleDarkMode}
-                  className="w-5 h-5 accent-duo-green rounded cursor-pointer"
-                />
+                <ThemeToggle />
               </div>
 
               {/* Sound Effects */}

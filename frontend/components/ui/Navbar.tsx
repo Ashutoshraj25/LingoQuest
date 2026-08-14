@@ -26,6 +26,7 @@ import {
 import { clsx } from "clsx";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 interface NavbarProps {
   user?: {
@@ -144,9 +145,9 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange
 
   return (
     <>
-      <header className="h-16 fixed top-0 right-0 left-0 lg:left-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b-2 border-gray-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between z-30 transition-all">
-        {/* Left Section: Hamburger Button (Tablet/Mobile) & Language Selector */}
-        <div className="flex items-center gap-3">
+      <header className="h-16 fixed top-0 right-0 left-0 lg:left-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b-2 border-gray-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between z-30 transition-colors duration-300">
+        {/* Left Section: Hamburger Button, Theme Toggle & Language Selector */}
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Hamburger Menu Button (<1024px) */}
           <button
             onClick={() => setIsDrawerOpen(!isDrawerOpen)}
@@ -157,6 +158,11 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange
           >
             {isDrawerOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
+
+          {/* ThemeToggle on Mobile (beside hamburger menu) */}
+          <div className="lg:hidden">
+            <ThemeToggle />
+          </div>
 
           {/* Indian Language Selector Dropdown */}
           <div className="relative">
@@ -189,6 +195,11 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange
                 ))}
               </div>
             )}
+          </div>
+
+          {/* ThemeToggle on Desktop (beside language selector and before streak, gems, hearts) */}
+          <div className="hidden lg:flex items-center ml-1">
+            <ThemeToggle />
           </div>
         </div>
 
