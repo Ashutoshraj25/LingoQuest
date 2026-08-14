@@ -37,16 +37,17 @@ def get_dashboard(request: Request, user_id: int = 1, db: Session = Depends(get_
     units_data = []
     if course:
         units = db.query(Unit).filter(Unit.course_id == course.id).order_by(Unit.order).all()
+        # Batch fetch user progress in 1 query for instant performance
+        user_progress_map = {
+            p.skill_id: p for p in db.query(UserProgress).filter(UserProgress.user_id == user.id).all()
+        }
         
         for unit in units:
             skills = db.query(Skill).filter(Skill.unit_id == unit.id).order_by(Skill.order).all()
             skills_data = []
             
             for skill in skills:
-                prog = db.query(UserProgress).filter(
-                    UserProgress.user_id == user.id,
-                    UserProgress.skill_id == skill.id
-                ).first()
+                prog = user_progress_map.get(skill.id)
                 
                 completed_lessons = prog.completed_lessons if prog else 0
                 is_completed = prog.is_completed if prog else False

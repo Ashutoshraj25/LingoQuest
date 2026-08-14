@@ -70,13 +70,14 @@ app.include_router(user.router)
 def startup_event():
     logger.info("Starting LingoQuest FastAPI Application...")
     try:
-        from app.models.models import User
+        from app.models.models import User, Exercise
         from app.database.session import SessionLocal
         db = SessionLocal()
         user_count = db.query(User).count()
+        exercise_count = db.query(Exercise).count()
         db.close()
-        if user_count == 0:
-            logger.info("Database is empty. Running seed_database()...")
+        if user_count == 0 or exercise_count < 1250:
+            logger.info("Database empty or missing complete authentic exercises (< 1250). Running seed_database()...")
             seed_database()
     except Exception as e:
         logger.warning(f"Startup check/seed note: {e}")

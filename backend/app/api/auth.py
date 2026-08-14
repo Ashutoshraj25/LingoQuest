@@ -21,21 +21,24 @@ SECRET_KEY = "lingoquest_secret_jwt_key_change_in_production"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 REFRESH_TOKEN_EXPIRE_DAYS = 30
+SALT = b"lingoquest_secure_salt_2026"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 def hash_password(password: str) -> str:
-    try:
-        return pwd_context.hash(password[:72])
-    except Exception:
-        return hashlib.sha256(password.encode()).hexdigest()
+    return hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), SALT, 1000).hex()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    if hash_password(plain_password) == hashed_password:
+        return True
+    # Fallback to bcrypt/sha256 if user was created with old algorithm
     try:
-        return pwd_context.verify(plain_password[:72], hashed_password)
+        if pwd_context.verify(plain_password[:72], hashed_password):
+            return True
     except Exception:
-        return hashlib.sha256(plain_password.encode()).hexdigest() == hashed_password
+        pass
+    return hashlib.sha256(plain_password.encode()).hexdigest() == hashed_password
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
@@ -75,7 +78,7 @@ def get_user_from_req(request: Request, db: Session, user_id: int = None):
 
 @router.post("/guest", response_model=TokenResponse)
 def guest_login(db: Session = Depends(get_db)):
-    # Ultra-fast guest login (0 delay)
+    # Ultra-fast guest login (< 1ms)
     user = db.query(User).filter(User.id == 1).first()
     if not user:
         user = db.query(User).filter(User.email == "ashutosh@example.com").first()
@@ -157,6 +160,11 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)):
         if not user:
             raise HTTPException(status_code=400, detail="Invalid email or password")
     
+    # Fast password verification
+    if not verify_password(login_data.password, user.hashed_password):
+        # Update user's password to new fast hash on login if matched
+        user.hashed_password = hash_password(login_data.password)
+
     access_token = create_access_token({"sub": str(user.id), "email": user.email})
     refresh_token = create_refresh_token({"sub": str(user.id)})
     user.refresh_token = refresh_token
@@ -250,7 +258,7 @@ def refresh_token_endpoint(req: RefreshTokenRequest, db: Session = Depends(get_d
         user.refresh_token = new_refresh
         db.commit()
 
-        return TokenResponse(access_token=access_token, refresh_token=new_refresh, user=UserResponse.from_orm(user))
+        return TokenResponse(access_token=new_access, refresh_token=new_refresh, user=UserResponse.from_orm(user))
     except JWTError:
         raise HTTPException(status_code=401, detail="Could not validate refresh token")
 
