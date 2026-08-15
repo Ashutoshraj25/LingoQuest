@@ -57,7 +57,7 @@ export default function LeaderboardPage() {
         returnUrl="/leaderboard"
       />
 
-      <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
+      <main className="lg:pl-64 pt-16 lg:data-[header-hidden=true]:pt-4 transition-[padding] duration-250 ease-in-out h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100 mb-1">

@@ -71,7 +71,7 @@ export default function ShopPage() {
         returnUrl="/shop"
       />
 
-      <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
+      <main className="lg:pl-64 pt-16 lg:data-[header-hidden=true]:pt-4 transition-[padding] duration-250 ease-in-out h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
         {/* Shop Banner */}
         <div className="mb-8 p-6 bg-gradient-to-r from-duo-purple to-purple-600 rounded-3xl text-white shadow-lg flex items-center justify-between">
           <div>

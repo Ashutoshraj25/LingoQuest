@@ -75,8 +75,84 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Desktop Auto-Hiding Navbar Effect
+  useEffect(() => {
+    let lastScrollTop = 0;
+    let currentMouseY = 100;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      currentMouseY = e.clientY;
+      if (currentMouseY <= 40) {
+        setIsHeaderVisible(true);
+        if (typeof document !== "undefined") {
+          document.documentElement.setAttribute("data-header-hidden", "false");
+        }
+      }
+    };
+
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement | Document;
+      let scrollTop = 0;
+      if (target && "scrollTop" in target && typeof target.scrollTop === "number") {
+        scrollTop = target.scrollTop;
+      } else {
+        scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+      }
+
+      // 1. At very top (<= 10px) -> Always show header
+      if (scrollTop <= 10) {
+        setIsHeaderVisible(true);
+        if (typeof document !== "undefined") {
+          document.documentElement.setAttribute("data-header-hidden", "false");
+        }
+        lastScrollTop = scrollTop;
+        return;
+      }
+
+      // 2. Mouse in top 40px -> Always show header
+      if (currentMouseY <= 40) {
+        setIsHeaderVisible(true);
+        if (typeof document !== "undefined") {
+          document.documentElement.setAttribute("data-header-hidden", "false");
+        }
+        lastScrollTop = scrollTop;
+        return;
+      }
+
+      // 3. Compare scroll direction
+      const diff = scrollTop - lastScrollTop;
+      if (diff > 5) {
+        // Scrolling DOWN -> Hide header on desktop
+        setIsHeaderVisible(false);
+        if (typeof document !== "undefined") {
+          document.documentElement.setAttribute("data-header-hidden", "true");
+        }
+      } else if (diff < -5) {
+        // Scrolling UP -> Show header on desktop
+        setIsHeaderVisible(true);
+        if (typeof document !== "undefined") {
+          document.documentElement.setAttribute("data-header-hidden", "false");
+        }
+      }
+
+      lastScrollTop = scrollTop;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("scroll", handleScroll, { capture: true, passive: true });
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll, { capture: true });
+      if (typeof document !== "undefined") {
+        document.documentElement.setAttribute("data-header-hidden", "false");
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (user.language_to_learn) {
@@ -135,7 +211,13 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange
 
   return (
     <>
-      <header className="h-16 fixed top-0 right-0 left-0 lg:left-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b-2 border-gray-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between z-30 transition-colors duration-300">
+      <header
+        className={clsx(
+          "h-16 fixed top-0 right-0 left-0 lg:left-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b-2 border-gray-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between z-30 transition-transform duration-250 ease-in-out",
+          isHeaderVisible ? "translate-y-0" : "lg:-translate-y-full translate-y-0"
+        )}
+        style={{ transitionDuration: "250ms" }}
+      >
         {/* Left Section: Hamburger Button, Theme Toggle & Language Selector */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Hamburger Menu Button (<1024px) */}

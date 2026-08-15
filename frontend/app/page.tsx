@@ -248,9 +248,9 @@ export default function DashboardPage() {
       />
 
       {/* 3. Main Container */}
-      <div className="lg:pl-64 pt-16 h-screen w-full flex flex-col lg:flex-row overflow-hidden">
+      <div className="lg:pl-64 pt-16 lg:data-[header-hidden=true]:pt-0 h-screen w-full flex flex-col lg:flex-row overflow-hidden transition-[padding] duration-250 ease-in-out">
         {/* Central Learning Path - INDEPENDENTLY SCROLLABLE */}
-        <main className="flex-1 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar scroll-smooth max-w-2xl mx-auto px-4 py-8">
+        <main className="flex-1 h-[calc(100vh-4rem)] lg:data-[header-hidden=true]:h-screen transition-[height] duration-250 ease-in-out overflow-y-auto no-scrollbar scroll-smooth max-w-2xl mx-auto px-4 py-8">
           {/* DEMO MODE TOP BANNER */}
           {!isAuthenticated && (
             <div className="mb-8 p-4 sm:p-5 rounded-3xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-duo-green flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
@@ -336,7 +336,7 @@ export default function DashboardPage() {
         </main>
 
         {/* DESKTOP RIGHT SIDEBAR WIDGET (>=1024px) - FIXED ON DESKTOP */}
-        <aside className="hidden lg:block w-80 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar p-6 space-y-6 shrink-0 border-l border-gray-100 dark:border-slate-800">
+        <aside className="hidden lg:block w-80 h-[calc(100vh-4rem)] lg:data-[header-hidden=true]:h-screen transition-[height] duration-250 ease-in-out overflow-y-auto no-scrollbar p-6 space-y-6 shrink-0 border-l border-gray-100 dark:border-slate-800">
           <RightPanelWidgets
             user={user}
             isAuthenticated={isAuthenticated}
