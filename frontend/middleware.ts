@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Pages that require authentication
+// Pages that require authentication for state-changing actions
 const PROTECTED_ROUTES = [
-  "/",
   "/practice",
   "/lesson",
   "/achievements",
@@ -27,11 +26,21 @@ const PUBLIC_AUTH_ROUTES = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Check for token cookie or auth header fallback indicator
+  // Bypass middleware for Next.js build worker & internal static requests
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    request.headers.get("x-nextjs-data") ||
+    request.headers.get("purpose") === "prefetch"
+  ) {
+    return NextResponse.next();
+  }
+
+  // Check for token cookie
   const token = request.cookies.get("token")?.value;
 
   const isProtectedRoute = PROTECTED_ROUTES.some(
-    (route) => pathname === route || (route !== "/" && pathname.startsWith(route))
+    (route) => pathname === route || pathname.startsWith(route + "/")
   );
   
   const isAuthRoute = PUBLIC_AUTH_ROUTES.some(
@@ -41,13 +50,11 @@ export function middleware(request: NextRequest) {
   // Unauthenticated user attempting to access protected route -> redirect to login with returnUrl
   if (isProtectedRoute && !token) {
     const loginUrl = new URL("/auth/login", request.url);
-    if (pathname !== "/") {
-      loginUrl.searchParams.set("returnUrl", pathname);
-    }
+    loginUrl.searchParams.set("returnUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Authenticated user attempting to access login/register -> redirect to dashboard
+  // Authenticated user attempting to access login/register -> redirect to root dashboard
   if (isAuthRoute && token) {
     return NextResponse.redirect(new URL("/", request.url));
   }
@@ -57,9 +64,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except static files, _next, favicon.ico, and images
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

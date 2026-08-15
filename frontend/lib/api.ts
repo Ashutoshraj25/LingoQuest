@@ -25,6 +25,9 @@ export async function fetchApi<T = any>(endpoint: string, options: RequestInit =
 }
 
 export const api = {
+  pingHealth: () => 
+    fetchApi("/health").catch(() => {}),
+
   login: (data: { email: string; password: string; remember_me?: boolean }) => 
     fetchApi("/auth/login", { method: "POST", body: JSON.stringify(data) }),
   

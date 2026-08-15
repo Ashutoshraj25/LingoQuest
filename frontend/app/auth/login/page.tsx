@@ -11,12 +11,18 @@ import { Zap } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, googleLogin, guestLogin } = useAuth();
+  const { user, login, googleLogin, guestLogin } = useAuth();
   const [email, setEmail] = useState("ashutosh@example.com");
   const [password, setPassword] = useState("password123");
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (user) {
+      router.replace("/");
+    }
+  }, [user, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

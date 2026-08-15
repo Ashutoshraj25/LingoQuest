@@ -41,33 +41,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Session initialization & Token persistence
+    // Instant local cache resolution (<10ms)
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
 
     if (storedToken && storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
         document.cookie = `token=${storedToken}; path=/; max-age=86400`;
       } catch (e) {
         console.error("Error parsing user session:", e);
       }
     }
 
-    // Fetch fresh profile from backend
-    api.getUserProfile()
-      .then((profile) => {
-        if (profile && profile.id) {
-          setUser(profile);
-          localStorage.setItem("user", JSON.stringify(profile));
-        }
-      })
-      .catch(() => {
-        if (!localStorage.getItem("token")) {
-          setUser(null);
-        }
-      })
-      .finally(() => setLoading(false));
+    setLoading(false);
+
+    // Silent Render server warm-up (non-blocking)
+    api.pingHealth();
+
+    // Non-blocking background profile synchronization
+    if (storedToken) {
+      api.getUserProfile()
+        .then((profile) => {
+          if (profile && profile.id) {
+            setUser(profile);
+            localStorage.setItem("user", JSON.stringify(profile));
+          }
+        })
+        .catch((err) => {
+          if (err instanceof Error && /401|403/.test(err.message)) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("user");
+            document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            setUser(null);
+          }
+        });
+    }
   }, []);
 
   const saveAuthSession = (res: any) => {
@@ -119,7 +130,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     api.logout().catch(() => {});
 
-    window.location.replace("/auth/login");
+    // Redirect to Landing Page (root route)
+    window.location.replace("/");
   };
 
   return (

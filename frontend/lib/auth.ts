@@ -26,6 +26,7 @@ export type StoredUser = {
 };
 
 export function persistAuthSession(accessToken: string, user?: unknown) {
+  if (typeof window === "undefined") return;
   localStorage.setItem(TOKEN_KEY, accessToken);
   if (user) {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -33,10 +34,12 @@ export function persistAuthSession(accessToken: string, user?: unknown) {
 }
 
 export function getStoredToken() {
+  if (typeof window === "undefined") return null;
   return localStorage.getItem(TOKEN_KEY);
 }
 
 export function getStoredUser(): StoredUser | null {
+  if (typeof window === "undefined") return null;
   const rawUser = localStorage.getItem(USER_KEY);
   if (!rawUser) {
     return null;
@@ -51,6 +54,7 @@ export function getStoredUser(): StoredUser | null {
 }
 
 export function clearAuthSession() {
+  if (typeof window === "undefined") return;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
 }

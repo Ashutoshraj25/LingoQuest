@@ -10,13 +10,23 @@ import { LessonNode } from "@/features/learning-path/LessonNode";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { Trophy, Dumbbell } from "lucide-react";
+import { Trophy, Dumbbell, Sparkles } from "lucide-react";
 import { api } from "@/lib/api";
-import { clearAuthSession, getStoredToken, getStoredUser } from "@/lib/auth";
+import { getStoredToken, getStoredUser } from "@/lib/auth";
 import { FirstLanguageModal } from "@/components/auth/FirstLanguageModal";
+import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
+import { useAuth } from "@/context/AuthContext";
 
 // Shared Right Panel Widgets Component
-const RightPanelWidgets = ({ user }: { user: any }) => (
+const RightPanelWidgets = ({
+  user,
+  isAuthenticated,
+  onAuthRequired,
+}: {
+  user: any;
+  isAuthenticated: boolean;
+  onAuthRequired: (action: string) => void;
+}) => (
   <>
     {/* Language Progress Card */}
     <Card className="p-5 border-2 border-gray-200 dark:border-slate-800 bg-sky-50/50 dark:bg-slate-800/50 space-y-3">
@@ -54,11 +64,21 @@ const RightPanelWidgets = ({ user }: { user: any }) => (
       <p className="text-xs font-semibold text-gray-500 dark:text-slate-400">
         Strengthen your {user.language_to_learn || "Hindi"} vocabulary and grammar skills.
       </p>
-      <Link href="/practice">
-        <Button variant="purple" className="w-full text-xs py-2.5 uppercase font-black tracking-wide">
+      {isAuthenticated ? (
+        <Link href="/practice">
+          <Button variant="purple" className="w-full text-xs py-2.5 uppercase font-black tracking-wide">
+            Start Practice Mode
+          </Button>
+        </Link>
+      ) : (
+        <Button
+          variant="purple"
+          onClick={() => onAuthRequired("start practice mode")}
+          className="w-full text-xs py-2.5 uppercase font-black tracking-wide"
+        >
           Start Practice Mode
         </Button>
-      </Link>
+      )}
     </Card>
 
     {/* Leaderboard Preview Card */}
@@ -83,7 +103,7 @@ const RightPanelWidgets = ({ user }: { user: any }) => (
         <div className="flex items-center justify-between p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-duo-green text-xs font-bold">
           <div className="flex items-center gap-2">
             <span className="font-black text-duo-green">#2</span>
-            <span className="text-duo-green font-extrabold">You (Ashutosh)</span>
+            <span className="text-duo-green font-extrabold">You (Visitor)</span>
           </div>
           <span className="font-extrabold text-duo-green">4,250 XP</span>
         </div>
@@ -94,9 +114,24 @@ const RightPanelWidgets = ({ user }: { user: any }) => (
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { user: authUser, loading: authLoading } = useAuth();
   const [dashboardData, setDashboardData] = useState<any>(null);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [authModalState, setAuthModalState] = useState<{
+    isOpen: boolean;
+    actionText: string;
+    returnUrl: string;
+  }>({
+    isOpen: false,
+    actionText: "start lessons and save progress",
+    returnUrl: "/",
+  });
+
+  const token = getStoredToken();
+  const storedUser = getStoredUser();
+  const activeUser = authUser || storedUser;
+
+  const isAuthenticated = Boolean(token || activeUser);
 
   const fetchDashboard = useCallback((userId: number) => {
     api.getDashboard(userId)
@@ -107,41 +142,50 @@ export default function DashboardPage() {
         }
       })
       .catch((err) => {
-        if (err instanceof Error && /401|403|404/.test(err.message)) {
-          clearAuthSession();
-          router.replace("/auth/login");
-          return;
-        }
         console.warn("Fallback dashboard data:", err);
       });
-  }, [router]);
+  }, []);
 
   useEffect(() => {
-    const token = getStoredToken();
-    const storedUser = getStoredUser();
-    if (!token || !storedUser) {
-      clearAuthSession();
-      router.replace("/auth/login");
-      return;
+    if (activeUser?.id) {
+      fetchDashboard(activeUser.id);
     }
+  }, [activeUser?.id, fetchDashboard]);
 
-    setIsCheckingAuth(false);
-    fetchDashboard(storedUser.id);
-  }, [router, fetchDashboard]);
+  const handleAuthRequired = (actionText: string, returnUrl: string = "/") => {
+    setAuthModalState({
+      isOpen: true,
+      actionText,
+      returnUrl,
+    });
+  };
 
-  if (isCheckingAuth) {
-    return null;
+  // Loading State - Fast Skeleton (<10ms resolution)
+  if (authLoading) {
+    return (
+      <div className="h-screen w-screen bg-white dark:bg-slate-900 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-duo-green flex items-center justify-center text-white font-extrabold text-2xl font-['Fredoka'] animate-bounce">
+            L
+          </div>
+          <span className="font-extrabold text-xs text-gray-400 font-['Fredoka'] uppercase tracking-wider">
+            Loading LingoQuest...
+          </span>
+        </div>
+      </div>
+    );
   }
 
-  const user = dashboardData?.user || {
-    username: "AshutoshExplorer",
-    full_name: "Ashutosh Raj",
+  // User Profile Data (Authenticated or Demo Mode Visitor)
+  const user = dashboardData?.user || activeUser || {
+    username: "VisitorExplorer",
+    full_name: "Demo Visitor",
     streak: 5,
     streak_count: 5,
     xp: 1240,
     hearts: 5,
     gems: 450,
-    avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Ashutosh",
+    avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Visitor",
     language_to_learn: "Hindi",
   };
 
@@ -178,10 +222,8 @@ export default function DashboardPage() {
 
   const handleLanguageModalSelect = (selectedLang: string) => {
     setShowLanguageModal(false);
-    if (dashboardData?.user) {
-      fetchDashboard(dashboardData.user.id);
-    } else {
-      window.location.reload();
+    if (user?.id && isAuthenticated) {
+      fetchDashboard(user.id);
     }
   };
 
@@ -191,17 +233,55 @@ export default function DashboardPage() {
       <Sidebar />
 
       {/* 2. Top Header (Sticky/Fixed) */}
-      <Navbar user={user} onLanguageChange={() => fetchDashboard(user.id)} />
+      <Navbar user={user} onLanguageChange={() => user?.id && isAuthenticated && fetchDashboard(user.id)} />
 
       <FirstLanguageModal
         isOpen={showLanguageModal}
         onSelectLanguage={handleLanguageModalSelect}
       />
 
+      <AuthPromptModal
+        isOpen={authModalState.isOpen}
+        onClose={() => setAuthModalState((prev) => ({ ...prev, isOpen: false }))}
+        actionText={authModalState.actionText}
+        returnUrl={authModalState.returnUrl}
+      />
+
       {/* 3. Main Container */}
       <div className="lg:pl-64 pt-16 h-screen w-full flex flex-col lg:flex-row overflow-hidden">
         {/* Central Learning Path - INDEPENDENTLY SCROLLABLE */}
         <main className="flex-1 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar scroll-smooth max-w-2xl mx-auto px-4 py-8">
+          {/* DEMO MODE TOP BANNER */}
+          {!isAuthenticated && (
+            <div className="mb-8 p-4 sm:p-5 rounded-3xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-duo-green flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-duo-green/20 text-duo-green flex items-center justify-center font-black text-xl shrink-0">
+                  <Sparkles className="w-5 h-5 text-duo-green" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-gray-800 dark:text-slate-100 font-['Fredoka']">
+                    Demo Mode Preview
+                  </h4>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-slate-400">
+                    Sign in to save your learning progress, earn XP, and unlock all units!
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                <Link href="/auth/login" className="w-full sm:w-auto">
+                  <Button variant="green" className="text-xs uppercase font-extrabold py-2.5 px-4 w-full shadow-duo-green">
+                    Log In
+                  </Button>
+                </Link>
+                <Link href="/auth/register" className="w-full sm:w-auto">
+                  <Button variant="blue" className="text-xs uppercase font-extrabold py-2.5 px-4 w-full shadow-duo-blue">
+                    Create Account
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          )}
+
           {units.map((unit: any) => (
             <div key={unit.id} className="mb-12">
               <UnitHeader
@@ -215,17 +295,27 @@ export default function DashboardPage() {
                 {unit.skills.map((skill: any, idx: number) => {
                   const xOffset = offsets[idx % offsets.length];
                   return (
-                    <LessonNode
+                    <div
                       key={skill.id}
-                      id={skill.id}
-                      title={skill.title}
-                      completedLessons={skill.completed_lessons}
-                      totalLessons={skill.total_lessons}
-                      isUnlocked={skill.is_unlocked}
-                      isCompleted={skill.is_completed}
-                      colorHex={unit.color_hex}
-                      xOffset={xOffset}
-                    />
+                      onClick={(e) => {
+                        if (!isAuthenticated) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleAuthRequired("start a lesson and save progress", `/lesson/${skill.id}`);
+                        }
+                      }}
+                    >
+                      <LessonNode
+                        id={skill.id}
+                        title={skill.title}
+                        completedLessons={skill.completed_lessons}
+                        totalLessons={skill.total_lessons}
+                        isUnlocked={skill.is_unlocked}
+                        isCompleted={skill.is_completed}
+                        colorHex={unit.color_hex}
+                        xOffset={xOffset}
+                      />
+                    </div>
                   );
                 })}
               </div>
@@ -237,13 +327,21 @@ export default function DashboardPage() {
             <h3 className="font-extrabold text-lg text-gray-800 dark:text-slate-100 font-['Fredoka']">
               Your Progress & Daily Practice
             </h3>
-            <RightPanelWidgets user={user} />
+            <RightPanelWidgets
+              user={user}
+              isAuthenticated={isAuthenticated}
+              onAuthRequired={(act) => handleAuthRequired(act, "/practice")}
+            />
           </div>
         </main>
 
         {/* DESKTOP RIGHT SIDEBAR WIDGET (>=1024px) - FIXED ON DESKTOP */}
         <aside className="hidden lg:block w-80 h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar p-6 space-y-6 shrink-0 border-l border-gray-100 dark:border-slate-800">
-          <RightPanelWidgets user={user} />
+          <RightPanelWidgets
+            user={user}
+            isAuthenticated={isAuthenticated}
+            onAuthRequired={(act) => handleAuthRequired(act, "/practice")}
+          />
         </aside>
       </div>
     </div>
