@@ -50,7 +50,7 @@ export default function EditProfilePage() {
       <Sidebar />
       <Navbar />
 
-      <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-3xl mx-auto p-4 sm:p-6 w-full">
+      <main className="lg:pl-64 pt-20 sm:pt-24 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-3xl mx-auto px-4 sm:px-6 pb-12 w-full">
         <div className="mb-8">
           <h1 className="text-3xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100 mb-1">
             Edit Profile
