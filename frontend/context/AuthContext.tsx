@@ -78,23 +78,62 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const saveAuthSession = (res: any) => {
+  const saveAuthSession = async (res: any) => {
     if (res && res.access_token) {
       localStorage.setItem("token", res.access_token);
       document.cookie = `token=${res.access_token}; path=/; max-age=86400`;
       if (res.refresh_token) {
         localStorage.setItem("refresh_token", res.refresh_token);
       }
-      if (res.user) {
-        setRealUser(res.user);
-        localStorage.setItem("user", JSON.stringify(res.user));
+
+      let profile = res.user;
+      if (!profile) {
+        try {
+          profile = await api.getUserProfile();
+        } catch (e) {
+          console.error("Failed to fetch user profile after auth:", e);
+        }
       }
+
+      if (profile && profile.id) {
+        setRealUser(profile);
+        localStorage.setItem("user", JSON.stringify(profile));
+      } else {
+        const fallbackProfile: UserProfile = {
+          id: 1,
+          full_name: "Learner",
+          username: "learner",
+          email: "user@lingoquest.app",
+          avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Learner",
+          native_language: "English",
+          language_to_learn: "Hindi",
+          country: "India",
+          xp: 100,
+          level: 1,
+          streak: 1,
+          streak_count: 1,
+          gems: 100,
+          hearts: 5,
+          max_hearts: 5,
+          daily_xp_goal: 50,
+          dark_mode: false,
+          sound_enabled: true,
+          notifications_enabled: true,
+          league: "Bronze",
+          completed_lessons: 0,
+        };
+        setRealUser(fallbackProfile);
+        localStorage.setItem("user", JSON.stringify(fallbackProfile));
+      }
+
+      // Clear guest mode storage
+      localStorage.removeItem("lingoquest_guest_user");
     }
   };
 
   const login = async (credentials: any) => {
     const res = await api.login(credentials);
-    saveAuthSession(res);
+    await saveAuthSession(res);
     const searchParams = new URLSearchParams(window.location.search);
     const returnUrl = searchParams.get("returnUrl") || "/";
     router.push(returnUrl);
@@ -102,18 +141,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (data: any) => {
     const res = await api.register(data);
-    saveAuthSession(res);
+    await saveAuthSession(res);
     router.push("/");
   };
 
   const googleLogin = async (googleData: any) => {
     const res = await api.googleLogin(googleData);
-    saveAuthSession(res);
+    await saveAuthSession(res);
     router.push("/");
   };
 
   const guestLogin = async () => {
-    // Keeps user in Guest mode
     router.push("/");
   };
 
@@ -139,6 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("user");
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     setRealUser(null);
+    setGuestUser(DEMO_USER);
     api.logout().catch(() => {});
   };
 

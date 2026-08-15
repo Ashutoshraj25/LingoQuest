@@ -292,14 +292,14 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange
 
           {/* Log In & Create Account CTAs for Guest Users */}
           {!isAuthenticated && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <Link href="/auth/login">
-                <button className="px-3 sm:px-3.5 py-2 rounded-xl border-2 border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-extrabold uppercase tracking-wide text-gray-700 dark:text-slate-200 transition-all">
+                <button className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border-2 border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 text-[11px] sm:text-xs font-extrabold uppercase tracking-wide text-gray-700 dark:text-slate-200 transition-all">
                   Log In
                 </button>
               </Link>
               <Link href="/auth/register">
-                <button className="hidden sm:inline-block px-4 py-2 rounded-xl bg-duo-green text-white hover:bg-emerald-600 font-extrabold text-xs uppercase tracking-wide shadow-duo-green transition-all">
+                <button className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-duo-green text-white hover:bg-emerald-600 font-extrabold text-[11px] sm:text-xs uppercase tracking-wide shadow-duo-green transition-all">
                   Create Account
                 </button>
               </Link>
@@ -432,17 +432,41 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange
               );
             })}
 
-            {/* Drawer Logout Button */}
-            <button
-              onClick={() => {
-                setIsDrawerOpen(false);
-                logout();
-              }}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl font-bold uppercase tracking-wider text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all border-2 border-transparent hover:border-rose-200 dark:hover:border-rose-900/40 text-left min-h-[44px]"
-            >
-              <LogOut className="w-5 h-5 text-rose-500" />
-              <span>Logout</span>
-            </button>
+            {/* Drawer Auth Actions: Logout (if authenticated) or Log In / Create Account (if guest) */}
+            {isAuthenticated ? (
+              <button
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                  logout();
+                }}
+                className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl font-bold uppercase tracking-wider text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all border-2 border-transparent hover:border-rose-200 dark:hover:border-rose-900/40 text-left min-h-[44px]"
+              >
+                <LogOut className="w-5 h-5 text-rose-500" />
+                <span>Logout</span>
+              </button>
+            ) : (
+              <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-slate-800">
+                <Link
+                  href="/auth/login"
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="block w-full"
+                >
+                  <button className="w-full py-3 rounded-2xl border-2 border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-extrabold uppercase tracking-wide text-gray-700 dark:text-slate-200 transition-all min-h-[44px]">
+                    Log In
+                  </button>
+                </Link>
+
+                <Link
+                  href="/auth/register"
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="block w-full"
+                >
+                  <button className="w-full py-3 rounded-2xl bg-duo-green text-white hover:bg-emerald-600 font-extrabold text-xs uppercase tracking-wide shadow-duo-green transition-all min-h-[44px]">
+                    Create Account
+                  </button>
+                </Link>
+              </div>
+            )}
           </nav>
         </div>
 
