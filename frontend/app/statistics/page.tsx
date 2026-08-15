@@ -5,48 +5,48 @@ import { Sidebar } from "@/components/ui/Sidebar";
 import { Navbar } from "@/components/ui/Navbar";
 import { Card } from "@/components/ui/Card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { BarChart3, TrendingUp, Clock, Target, Calendar } from "lucide-react";
+import { TrendingUp, Clock, Target, Calendar } from "lucide-react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { DEMO_STATISTICS } from "@/lib/demoData";
 
 export default function StatisticsPage() {
+  const { user, isGuest } = useAuth();
   const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
-    api.getStatistics()
-      .then((data) => setStats(data))
-      .catch(() => {
-        setStats({
-          total_xp: 1240,
-          current_streak: 5,
-          completed_lessons: 14,
-          accuracy_percentage: 96.4,
-          learning_time_minutes: 185,
-          weekly_xp: [
-            { day: "Mon", xp: 450 },
-            { day: "Tue", xp: 600 },
-            { day: "Wed", xp: 520 },
-            { day: "Thu", xp: 800 },
-            { day: "Fri", xp: 650 },
-            { day: "Sat", xp: 720 },
-            { day: "Sun", xp: 510 },
-          ],
-          heatmap: Array.from({ length: 28 }, (_, i) => ({ date: i + 1, level: (i % 4) + 1 })),
-        });
-      });
-  }, []);
+    if (!isGuest) {
+      api.getStatistics()
+        .then((data) => setStats(data))
+        .catch(() => setStats(FALLBACK_STATS));
+    } else {
+      setStats(FALLBACK_STATS);
+    }
+  }, [isGuest]);
 
-  const weeklyData = stats?.weekly_xp || [];
-  const heatmapData = stats?.heatmap || [];
+  const FALLBACK_STATS = {
+    total_xp: DEMO_STATISTICS.total_xp,
+    current_streak: DEMO_STATISTICS.streak_days,
+    completed_lessons: DEMO_STATISTICS.lessons_completed,
+    accuracy_percentage: DEMO_STATISTICS.accuracy_percentage,
+    learning_time_minutes: DEMO_STATISTICS.time_spent_minutes,
+    weekly_xp: DEMO_STATISTICS.weekly_xp,
+    heatmap: Array.from({ length: 28 }, (_, i) => ({ date: i + 1, level: (i % 4) + 1 })),
+  };
+
+  const activeStats = stats || FALLBACK_STATS;
+  const weeklyData = activeStats.weekly_xp || [];
+  const heatmapData = activeStats.heatmap || [];
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
       <Sidebar />
-      <Navbar />
+      <Navbar user={user} />
 
       <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
         <div className="mb-8">
           <h1 className="text-3xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100 mb-1">
-            Your Statistics
+            Learning Analytics & Insights
           </h1>
           <p className="text-gray-500 font-semibold text-sm">
             Track your weekly XP trends, learning speed, and accuracy!
@@ -55,60 +55,59 @@ export default function StatisticsPage() {
 
         {/* Overview Metrics Header */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <Card className="p-4">
+          <Card className="p-4 border-2 border-gray-200 dark:border-slate-800">
             <div className="flex items-center gap-2 text-duo-green mb-1">
               <TrendingUp className="w-5 h-5" />
-              <span className="text-xs font-extrabold uppercase">Weekly XP</span>
+              <span className="text-xs font-black uppercase">Accuracy</span>
             </div>
-            <span className="text-2xl font-black text-gray-800 dark:text-slate-100">4,250 XP</span>
+            <p className="text-2xl font-black text-gray-800 dark:text-slate-100">
+              {activeStats.accuracy_percentage}%
+            </p>
           </Card>
-          <Card className="p-4">
+
+          <Card className="p-4 border-2 border-gray-200 dark:border-slate-800">
             <div className="flex items-center gap-2 text-duo-blue mb-1">
-              <Target className="w-5 h-5" />
-              <span className="text-xs font-extrabold uppercase">Accuracy</span>
-            </div>
-            <span className="text-2xl font-black text-gray-800 dark:text-slate-100">
-              {stats?.accuracy_percentage || 96.4}%
-            </span>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-duo-purple mb-1">
               <Clock className="w-5 h-5" />
-              <span className="text-xs font-extrabold uppercase">Learning Time</span>
+              <span className="text-xs font-black uppercase">Time Spent</span>
             </div>
-            <span className="text-2xl font-black text-gray-800 dark:text-slate-100">
-              {stats?.learning_time_minutes || 185}m
-            </span>
+            <p className="text-2xl font-black text-gray-800 dark:text-slate-100">
+              {activeStats.learning_time_minutes} min
+            </p>
           </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-duo-orange mb-1">
-              <BarChart3 className="w-5 h-5" />
-              <span className="text-xs font-extrabold uppercase">Lessons</span>
+
+          <Card className="p-4 border-2 border-gray-200 dark:border-slate-800">
+            <div className="flex items-center gap-2 text-duo-purple mb-1">
+              <Target className="w-5 h-5" />
+              <span className="text-xs font-black uppercase">Lessons</span>
             </div>
-            <span className="text-2xl font-black text-gray-800 dark:text-slate-100">
-              {stats?.completed_lessons || 14}
-            </span>
+            <p className="text-2xl font-black text-gray-800 dark:text-slate-100">
+              {activeStats.completed_lessons}
+            </p>
+          </Card>
+
+          <Card className="p-4 border-2 border-gray-200 dark:border-slate-800">
+            <div className="flex items-center gap-2 text-duo-orange mb-1">
+              <Calendar className="w-5 h-5" />
+              <span className="text-xs font-black uppercase">Streak</span>
+            </div>
+            <p className="text-2xl font-black text-gray-800 dark:text-slate-100">
+              {activeStats.current_streak} days
+            </p>
           </Card>
         </div>
 
-        {/* Recharts Weekly XP Graph */}
-        <Card className="mb-8 p-6">
-          <h3 className="text-xl font-extrabold font-['Fredoka'] mb-6 text-gray-800 dark:text-slate-100">
-            Weekly XP Activity
+        {/* Recharts Weekly XP Chart */}
+        <Card className="p-6 mb-8 border-2 border-gray-200 dark:border-slate-800">
+          <h3 className="font-extrabold text-lg font-['Fredoka'] text-gray-800 dark:text-slate-100 mb-6">
+            Weekly XP Earned
           </h3>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyData}>
-                <XAxis dataKey="day" stroke="#AFAFAF" fontSize={12} tickLine={false} />
-                <YAxis stroke="#AFAFAF" fontSize={12} tickLine={false} />
+                <XAxis dataKey="day" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#18262F",
-                    borderRadius: "12px",
-                    border: "none",
-                    color: "#fff",
-                    fontWeight: "bold",
-                  }}
+                  contentStyle={{ backgroundColor: "#1E293B", borderRadius: "12px", border: "none", color: "#FFF" }}
                 />
                 <Bar dataKey="xp" fill="#58CC02" radius={[8, 8, 0, 0]} />
               </BarChart>
@@ -116,32 +115,21 @@ export default function StatisticsPage() {
           </div>
         </Card>
 
-        {/* GitHub Style Daily Activity Heatmap */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100">
-              Streak Activity Calendar
-            </h3>
-            <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
-              <Calendar className="w-4 h-4" />
-              <span>August 2026</span>
-            </div>
-          </div>
+        {/* Activity Heatmap Grid */}
+        <Card className="p-6 border-2 border-gray-200 dark:border-slate-800">
+          <h3 className="font-extrabold text-lg font-['Fredoka'] text-gray-800 dark:text-slate-100 mb-4">
+            Practice Consistency Grid (Last 28 Days)
+          </h3>
           <div className="grid grid-cols-7 gap-2">
-            {heatmapData.map((day: any, i: number) => {
-              const colors = [
-                "bg-gray-100 dark:bg-slate-800",
-                "bg-emerald-200 dark:bg-emerald-950",
-                "bg-emerald-400 dark:bg-emerald-800",
-                "bg-duo-green",
-              ];
-              const level = day.level || (i % 4);
+            {heatmapData.map((item: any, i: number) => {
+              const bgColors = ["bg-gray-100 dark:bg-slate-800", "bg-emerald-200", "bg-emerald-400", "bg-duo-green"];
               return (
                 <div
                   key={i}
-                  className={`h-10 rounded-xl flex items-center justify-center font-bold text-xs ${colors[level]} text-slate-700 dark:text-slate-200 shadow-sm`}
+                  className={`h-10 rounded-xl ${bgColors[item.level % bgColors.length]} flex items-center justify-center font-bold text-xs`}
+                  title={`Day ${item.date}: Practice completed`}
                 >
-                  {i + 1}
+                  {item.date}
                 </div>
               );
             })}

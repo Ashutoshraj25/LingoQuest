@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Mascot } from "@/components/ui/Mascot";
 import { Button } from "@/components/ui/Button";
-import { X, Lock, Sparkles } from "lucide-react";
+import { X, Sparkles, CheckCircle2 } from "lucide-react";
 
 interface AuthPromptModalProps {
   isOpen: boolean;
@@ -17,8 +17,8 @@ interface AuthPromptModalProps {
 export const AuthPromptModal: React.FC<AuthPromptModalProps> = ({
   isOpen,
   onClose,
-  title = "Save Your Progress!",
-  actionText = "start lessons, save progress, and earn XP",
+  title = "Save your learning progress",
+  actionText = "save progress and track achievements",
   returnUrl = "/",
 }) => {
   if (!isOpen) return null;
@@ -47,27 +47,47 @@ export const AuthPromptModal: React.FC<AuthPromptModalProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Mascot & Lock Icon */}
+        {/* Mascot */}
         <div className="flex flex-col items-center justify-center pt-2">
           <Mascot
             mood="happy"
             size={110}
-            speechBubble="Sign in to save your progress and continue learning!"
+            speechBubble="Create a free account to save your progress permanently!"
           />
         </div>
 
         <div>
-          <h2 className="text-2xl font-extrabold font-['Fredoka'] text-gray-900 dark:text-slate-100 mb-1 flex items-center justify-center gap-2">
+          <h2 className="text-2xl font-extrabold font-['Fredoka'] text-gray-900 dark:text-slate-100 mb-2 flex items-center justify-center gap-2">
             <Sparkles className="w-5 h-5 text-duo-yellow fill-duo-yellow" />
             <span>{title}</span>
           </h2>
-          <p className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-slate-400 max-w-xs mx-auto">
-            Please log in or create a free account to {actionText}.
+          
+          <p className="text-xs font-bold text-gray-500 dark:text-slate-400 mb-3">
+            Create an account or Login to:
           </p>
+
+          <div className="bg-sky-50/70 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-sky-200 dark:border-slate-700 text-left space-y-2 text-xs font-bold text-gray-700 dark:text-slate-200">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-duo-green shrink-0" />
+              <span>Save XP and level up your rank</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-duo-green shrink-0" />
+              <span>Save Hearts & maintain 21+ day streaks</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-duo-green shrink-0" />
+              <span>Continue learning seamlessly on any device</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-duo-green shrink-0" />
+              <span>Unlock all badges and Gold League trophies</span>
+            </div>
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-2.5 pt-2">
+        <div className="space-y-2.5 pt-1">
           <Link href={loginHref} onClick={onClose} className="block w-full">
             <Button
               variant="green"

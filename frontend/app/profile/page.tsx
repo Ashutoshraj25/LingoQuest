@@ -1,118 +1,146 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { Sidebar } from "@/components/ui/Sidebar";
 import { Navbar } from "@/components/ui/Navbar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Flame, Zap, Trophy, Heart, Calendar, Share2, UserPlus, MapPin, Globe } from "lucide-react";
+import { Flame, Zap, Trophy, Heart, Calendar, Share2, UserPlus, MapPin, Globe, Edit3 } from "lucide-react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<any>(null);
+  const { user, isGuest } = useAuth();
+  const [profileData, setProfileData] = useState<any>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
-    api.getUserProfile()
-      .then((res) => setProfile(res))
-      .catch(() => {
-        setProfile({
-          full_name: "Ashutosh Raj",
-          username: "ashutosh_raj",
-          avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Ashutosh",
-          native_language: "English",
-          language_to_learn: "Hindi",
-          country: "India",
-          xp: 1240,
-          streak: 5,
-          level: 12,
-          hearts: 5,
-        });
-      });
-  }, []);
+    if (!isGuest && user?.id) {
+      api.getUserProfile()
+        .then((res) => setProfileData(res))
+        .catch(() => {});
+    }
+  }, [isGuest, user?.id]);
 
-  const user = profile || {
-    full_name: "Ashutosh Raj",
-    username: "ashutosh_raj",
-    avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Ashutosh",
-    native_language: "English",
-    language_to_learn: "Hindi",
-    country: "India",
-    xp: 1240,
-    streak: 5,
-    level: 12,
-    hearts: 5,
-  };
+  const activeUser = profileData || user;
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
       <Sidebar />
-      <Navbar user={user} />
+      <Navbar user={activeUser} />
+
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        actionText="edit your profile and customize settings"
+        returnUrl="/profile/edit"
+      />
 
       <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
         {/* User Profile Header Card */}
         <Card className="mb-8 p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
             <div className="w-24 h-24 rounded-full border-4 border-duo-green overflow-hidden shadow-lg">
-              <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
+              <img src={activeUser.avatar_url} alt={activeUser.full_name} className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-3xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100">
-                {user.full_name}
+                {activeUser.full_name}
               </h1>
-              <p className="text-sm font-semibold text-gray-400 mt-1">
-                @{user.username} • Level {user.level || 12} Learner
-              </p>
-              <div className="flex items-center justify-center sm:justify-start gap-4 mt-3 text-xs text-gray-400 font-bold">
-                <span className="flex items-center gap-1"><Globe className="w-4 h-4 text-duo-blue" /> Native: {user.native_language}</span>
-                <span className="flex items-center gap-1"><MapPin className="w-4 h-4 text-duo-orange" /> {user.country}</span>
+              <p className="text-sm font-bold text-gray-400">@{activeUser.username}</p>
+              <div className="flex items-center gap-4 mt-3 text-xs font-extrabold text-gray-500 flex-wrap justify-center sm:justify-start">
+                <span className="flex items-center gap-1">
+                  <Globe className="w-4 h-4 text-duo-blue" /> Native: {activeUser.native_language || "English"}
+                </span>
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4 text-duo-orange" /> {activeUser.country || "India"}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4 text-duo-purple" /> Joined Aug 2026
+                </span>
               </div>
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <Button variant="blue" size="sm">
-              <UserPlus className="w-4 h-4 mr-2 inline" />
-              Add Friend
-            </Button>
-            <Button variant="white" size="sm">
-              <Share2 className="w-4 h-4 mr-2 inline" />
-              Share
+          <div className="flex items-center gap-3">
+            {isGuest ? (
+              <Button
+                variant="green"
+                size="sm"
+                onClick={() => setShowAuthModal(true)}
+              >
+                <Edit3 className="w-4 h-4 mr-2 inline" /> Edit Profile
+              </Button>
+            ) : (
+              <Link href="/profile/edit">
+                <Button variant="green" size="sm">
+                  <Edit3 className="w-4 h-4 mr-2 inline" /> Edit Profile
+                </Button>
+              </Link>
+            )}
+
+            <Button
+              variant="white"
+              size="sm"
+              onClick={() => {
+                if (isGuest) {
+                  setShowAuthModal(true);
+                } else if (navigator.share) {
+                  navigator.share({ title: "LingoQuest Profile", url: window.location.href });
+                }
+              }}
+            >
+              <Share2 className="w-4 h-4" />
             </Button>
           </div>
         </Card>
 
-        {/* Statistics Grid */}
-        <h2 className="text-2xl font-extrabold font-['Fredoka'] mb-4 text-gray-800 dark:text-slate-100">
+        {/* Overview Statistics Cards */}
+        <h2 className="text-xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100 mb-4">
           Statistics Overview
         </h2>
+
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <Card className="flex items-center gap-4">
-            <Flame className="w-8 h-8 fill-duo-orange text-duo-orange" />
-            <div>
-              <span className="text-2xl font-black text-gray-800 dark:text-slate-100">{user.streak || 5}</span>
-              <p className="text-xs font-bold text-gray-400">Day Streak</p>
+          <Card className="p-4 border-2 border-gray-200 dark:border-slate-800">
+            <div className="flex items-center gap-3 mb-2 text-duo-orange">
+              <Flame className="w-6 h-6 fill-duo-orange" />
+              <span className="text-xs font-black uppercase">Day Streak</span>
             </div>
+            <p className="text-2xl font-black text-gray-800 dark:text-slate-100">
+              {activeUser.streak_count || activeUser.streak || 21}
+            </p>
           </Card>
-          <Card className="flex items-center gap-4">
-            <Zap className="w-8 h-8 fill-duo-yellow text-duo-yellow" />
-            <div>
-              <span className="text-2xl font-black text-gray-800 dark:text-slate-100">{user.xp || 1240}</span>
-              <p className="text-xs font-bold text-gray-400">Total XP</p>
+
+          <Card className="p-4 border-2 border-gray-200 dark:border-slate-800">
+            <div className="flex items-center gap-3 mb-2 text-duo-yellow">
+              <Zap className="w-6 h-6 fill-duo-yellow text-duo-yellow" />
+              <span className="text-xs font-black uppercase">Total XP</span>
             </div>
+            <p className="text-2xl font-black text-gray-800 dark:text-slate-100">
+              {activeUser.xp || 2350}
+            </p>
           </Card>
-          <Card className="flex items-center gap-4">
-            <Trophy className="w-8 h-8 fill-duo-yellow text-duo-yellow" />
-            <div>
-              <span className="text-2xl font-black text-gray-800 dark:text-slate-100">Gold</span>
-              <p className="text-xs font-bold text-gray-400">Current League</p>
+
+          <Card className="p-4 border-2 border-gray-200 dark:border-slate-800">
+            <div className="flex items-center gap-3 mb-2 text-duo-purple">
+              <Trophy className="w-6 h-6 text-duo-purple" />
+              <span className="text-xs font-black uppercase">Current League</span>
             </div>
+            <p className="text-2xl font-black text-gray-800 dark:text-slate-100">
+              {activeUser.league || "Gold"}
+            </p>
           </Card>
-          <Card className="flex items-center gap-4">
-            <Heart className="w-8 h-8 fill-duo-red text-duo-red" />
-            <div>
-              <span className="text-2xl font-black text-gray-800 dark:text-slate-100">{user.hearts || 5} / 5</span>
-              <p className="text-xs font-bold text-gray-400">Hearts</p>
+
+          <Card className="p-4 border-2 border-gray-200 dark:border-slate-800">
+            <div className="flex items-center gap-3 mb-2 text-duo-red">
+              <Heart className="w-6 h-6 fill-duo-red text-duo-red" />
+              <span className="text-xs font-black uppercase">Hearts</span>
             </div>
+            <p className="text-2xl font-black text-gray-800 dark:text-slate-100">
+              {activeUser.hearts || 5} / 5
+            </p>
           </Card>
         </div>
       </main>

@@ -3,39 +3,26 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { api } from "@/lib/api";
-
-interface User {
-  id: number;
-  full_name: string;
-  username: string;
-  email: string;
-  avatar_url: string;
-  native_language: string;
-  language_to_learn: string;
-  country: string;
-  provider?: string;
-  google_id?: string;
-  xp: number;
-  level: number;
-  streak_count: number;
-  gems: number;
-  hearts: number;
-}
+import { DEMO_USER, UserProfile } from "@/lib/demoData";
 
 interface AuthContextType {
-  user: User | null;
+  user: UserProfile;
+  realUser: UserProfile | null;
+  isAuthenticated: boolean;
+  isGuest: boolean;
   loading: boolean;
   login: (credentials: any) => Promise<void>;
   register: (data: any) => Promise<void>;
   googleLogin: (googleData: any) => Promise<void>;
   guestLogin: () => Promise<void>;
   logout: () => void;
+  updateUserSession: (data: Partial<UserProfile>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [realUser, setRealUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -48,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (storedToken && storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
+        setRealUser(parsedUser);
         document.cookie = `token=${storedToken}; path=/; max-age=86400`;
       } catch (e) {
         console.error("Error parsing user session:", e);
@@ -65,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       api.getUserProfile()
         .then((profile) => {
           if (profile && profile.id) {
-            setUser(profile);
+            setRealUser(profile);
             localStorage.setItem("user", JSON.stringify(profile));
           }
         })
@@ -75,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.removeItem("refresh_token");
             localStorage.removeItem("user");
             document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-            setUser(null);
+            setRealUser(null);
           }
         });
     }
@@ -89,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("refresh_token", res.refresh_token);
       }
       if (res.user) {
-        setUser(res.user);
+        setRealUser(res.user);
         localStorage.setItem("user", JSON.stringify(res.user));
       }
     }
@@ -121,21 +108,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/");
   };
 
+  const updateUserSession = (updated: Partial<UserProfile>) => {
+    setRealUser((prev) => {
+      const next = { ...(prev || DEMO_USER), ...updated } as UserProfile;
+      if (prev) {
+        localStorage.setItem("user", JSON.stringify(next));
+      }
+      return next;
+    });
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    setUser(null);
+    setRealUser(null);
 
     api.logout().catch(() => {});
 
-    // Redirect to Landing Page (root route)
-    window.location.replace("/");
+    // Stay on current page, switch seamlessly to DEMO_USER
   };
 
+  const activeUser = realUser || DEMO_USER;
+  const isAuthenticated = Boolean(realUser);
+  const isGuest = !isAuthenticated;
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, googleLogin, guestLogin, logout }}>
+    <AuthContext.Provider
+      value={{
+        user: activeUser,
+        realUser,
+        isAuthenticated,
+        isGuest,
+        loading,
+        login,
+        register,
+        googleLogin,
+        guestLogin,
+        logout,
+        updateUserSession,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -6,31 +6,51 @@ import { Navbar } from "@/components/ui/Navbar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { Target, Flame, Check, Gem, Zap } from "lucide-react";
+import { Target, Check, Gem, Zap } from "lucide-react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { DEMO_DAILY_GOALS } from "@/lib/demoData";
+import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 
 export default function DailyGoalsPage() {
+  const { user, isGuest } = useAuth();
   const [data, setData] = useState<any>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
-    api.getDailyGoals()
-      .then((res) => setData(res))
-      .catch(() => {
-        setData({
-          daily_goal_xp: 50,
-          current_today_xp: 35,
-          quests: [
-            { id: 1, title: "Earn 50 XP", description: "Maintain your daily learning streak.", target_amount: 50, current_progress: 35, reward_xp: 30, reward_gems: 20, completed: false, claimed: false },
-            { id: 2, title: "Complete 2 Lessons", description: "Finish 2 path lessons today.", target_amount: 2, current_progress: 1, reward_xp: 40, reward_gems: 25, completed: false, claimed: false },
-            { id: 3, title: "Master 100% Accuracy", description: "Complete a lesson with 0 mistakes.", target_amount: 1, current_progress: 1, reward_xp: 50, reward_gems: 30, completed: true, claimed: false },
-          ],
-        });
-      });
-  }, []);
+    if (!isGuest) {
+      api.getDailyGoals()
+        .then((res) => setData(res))
+        .catch(() => setData(FALLBACK_GOALS));
+    } else {
+      setData(FALLBACK_GOALS);
+    }
+  }, [isGuest]);
 
-  const quests = data?.quests || [];
+  const FALLBACK_GOALS = {
+    daily_goal_xp: 50,
+    current_today_xp: 35,
+    quests: DEMO_DAILY_GOALS.map((q) => ({
+      id: q.id,
+      title: q.title,
+      description: "Complete daily practice to claim rewards.",
+      target_amount: q.max_progress,
+      current_progress: q.progress,
+      reward_xp: 30,
+      reward_gems: q.reward_gems,
+      completed: q.completed,
+      claimed: false,
+    })),
+  };
+
+  const activeData = data || FALLBACK_GOALS;
+  const quests = activeData.quests || [];
 
   const handleClaim = (id: number) => {
+    if (isGuest) {
+      setShowAuthModal(true);
+      return;
+    }
     api.claimQuest(id)
       .then(() => {
         setData((prev: any) => ({
@@ -44,7 +64,14 @@ export default function DailyGoalsPage() {
   return (
     <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
       <Sidebar />
-      <Navbar />
+      <Navbar user={user} />
+
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        actionText="claim daily quest rewards and save streak progress"
+        returnUrl="/daily-goals"
+      />
 
       <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
         <div className="mb-8 flex items-center justify-between">
@@ -59,61 +86,56 @@ export default function DailyGoalsPage() {
           <Target className="w-12 h-12 text-duo-orange" />
         </div>
 
-        {/* Main XP Goal Progress Banner */}
-        <Card className="mb-8 p-6 bg-orange-50 dark:bg-slate-800/80 border-duo-orange">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <Flame className="w-8 h-8 fill-duo-orange text-duo-orange animate-bounce" />
-              <div>
-                <h3 className="text-xl font-extrabold font-['Fredoka']">Today's XP Goal</h3>
-                <p className="text-xs text-gray-500 font-semibold">Earn {data?.daily_goal_xp || 50} XP to extend streak</p>
-              </div>
-            </div>
-            <span className="text-2xl font-black text-duo-orange">
-              {data?.current_today_xp || 35} / {data?.daily_goal_xp || 50} XP
+        {/* Daily XP Target Meter */}
+        <Card className="p-6 mb-8 border-2 border-gray-200 dark:border-slate-800 bg-orange-50/40 dark:bg-slate-800/40">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-extrabold text-sm text-gray-800 dark:text-slate-100">Daily XP Target</span>
+            <span className="font-black text-sm text-duo-orange">
+              {activeData.current_today_xp} / {activeData.daily_goal_xp} XP
             </span>
           </div>
-          <ProgressBar progress={Math.round(((data?.current_today_xp || 35) / (data?.daily_goal_xp || 50)) * 100)} color="orange" height="h-4" />
+          <ProgressBar
+            value={Math.round((activeData.current_today_xp / activeData.daily_goal_xp) * 100)}
+            max={100}
+            colorHex="#FF9600"
+            height="h-4"
+          />
         </Card>
 
-        {/* Quests List */}
-        <h3 className="text-xl font-extrabold font-['Fredoka'] mb-4 text-gray-800 dark:text-slate-100">
-          Active Daily Missions
-        </h3>
+        {/* Quest List */}
         <div className="space-y-4">
-          {quests.map((q: any) => {
-            const pct = Math.round((q.current_progress / q.target_amount) * 100);
+          {quests.map((quest: any) => {
+            const pct = Math.round((quest.current_progress / quest.target_amount) * 100);
             return (
-              <Card key={q.id} className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex-1 w-full">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-extrabold text-base font-['Fredoka'] text-gray-800 dark:text-slate-100">
-                      {q.title}
-                    </h4>
-                    <div className="flex items-center gap-3 text-xs font-bold">
-                      <span className="text-duo-yellow flex items-center gap-1">
-                        <Zap className="w-4 h-4 fill-duo-yellow" /> +{q.reward_xp} XP
-                      </span>
-                      <span className="text-duo-blue flex items-center gap-1">
-                        <Gem className="w-4 h-4 fill-duo-blue" /> +{q.reward_gems} Gems
-                      </span>
+              <Card key={quest.id} className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4 border-2 border-gray-200 dark:border-slate-800">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-slate-800 text-duo-orange flex items-center justify-center font-black text-xl shrink-0">
+                    🎯
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-base text-gray-800 dark:text-slate-100 font-['Fredoka']">{quest.title}</h3>
+                    <p className="text-xs font-semibold text-gray-400">{quest.description}</p>
+                    <div className="w-48 mt-2">
+                      <ProgressBar value={pct} max={100} colorHex="#FF9600" height="h-2" />
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400 font-semibold mb-3">{q.description}</p>
-                  <ProgressBar progress={pct} color="green" height="h-2.5" />
                 </div>
 
-                {q.completed && !q.claimed && (
-                  <Button variant="yellow" size="sm" onClick={() => handleClaim(q.id)} className="w-full sm:w-auto">
-                    CLAIM REWARD
-                  </Button>
-                )}
-
-                {q.claimed && (
-                  <span className="px-4 py-2 bg-emerald-100 text-emerald-700 font-extrabold text-xs rounded-xl flex items-center gap-1">
-                    <Check className="w-4 h-4" /> CLAIMED
-                  </span>
-                )}
+                <div className="w-full sm:w-auto shrink-0">
+                  {quest.claimed ? (
+                    <div className="flex items-center justify-center gap-1 text-xs font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-duo-green">
+                      <Check className="w-4 h-4 text-duo-green" /> Claimed
+                    </div>
+                  ) : quest.completed ? (
+                    <Button variant="green" size="sm" onClick={() => handleClaim(quest.id)} className="w-full">
+                      Claim +{quest.reward_gems} Gems
+                    </Button>
+                  ) : (
+                    <Button variant="white" size="sm" disabled className="w-full">
+                      {quest.current_progress}/{quest.target_amount}
+                    </Button>
+                  )}
+                </div>
               </Card>
             );
           })}

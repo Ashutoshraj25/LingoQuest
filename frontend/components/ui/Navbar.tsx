@@ -65,19 +65,9 @@ const drawerNavItems = [
 
 export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange }) => {
   const pathname = usePathname();
-  const { user: authUser, logout } = useAuth();
+  const { user: authUser, isAuthenticated, logout } = useAuth();
   
-  const user = authUser || propUser || {
-    full_name: "Ashutosh Raj",
-    username: "ashutosh_raj",
-    streak_count: 5,
-    streak: 5,
-    xp: 1240,
-    hearts: 5,
-    gems: 450,
-    avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Ashutosh",
-    language_to_learn: "Hindi",
-  };
+  const user = propUser || authUser;
 
   const [selectedLang, setSelectedLang] = useState(
     INDIAN_LANGUAGES.find((l) => l.name === user.language_to_learn) || INDIAN_LANGUAGES[0]
@@ -205,7 +195,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange
 
         {/* Right Section: Gamification Counters or Auth CTAs */}
         <div className="flex items-center gap-2 sm:gap-4 font-extrabold text-sm sm:text-base">
-          {authUser || typeof window !== "undefined" && localStorage.getItem("token") ? (
+          {isAuthenticated ? (
             <>
               {/* Streak */}
               <Link href="/daily-goals" className="flex items-center gap-1 sm:gap-1.5 text-duo-orange hover:opacity-80 transition-all min-h-[44px] px-1">

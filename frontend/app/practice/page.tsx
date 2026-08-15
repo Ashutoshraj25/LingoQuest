@@ -6,9 +6,12 @@ import { Sidebar } from "@/components/ui/Sidebar";
 import { Navbar } from "@/components/ui/Navbar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Dumbbell, RefreshCw, Zap, Timer, Heart } from "lucide-react";
+import { Dumbbell, RefreshCw, Timer, Heart } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function PracticeHubPage() {
+  const { user } = useAuth();
+
   const practiceModes = [
     {
       title: "Weak Skills",
@@ -47,7 +50,7 @@ export default function PracticeHubPage() {
   return (
     <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
       <Sidebar />
-      <Navbar />
+      <Navbar user={user} />
 
       <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
         <div className="mb-8">

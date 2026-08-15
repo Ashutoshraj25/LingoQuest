@@ -6,26 +6,43 @@ import { Navbar } from "@/components/ui/Navbar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { Trophy, Flame, Zap, Award, Lock, Check } from "lucide-react";
+import { Trophy, Award, Lock, Check } from "lucide-react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { DEMO_ACHIEVEMENTS } from "@/lib/demoData";
+import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 
 export default function AchievementsPage() {
+  const { user, isGuest } = useAuth();
   const [achievements, setAchievements] = useState<any[]>([]);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
-    api.getAchievements()
-      .then((res) => setAchievements(res))
-      .catch(() => {
-        setAchievements([
-          { id: 1, title: "Wildfire", description: "Reach a 7-day streak", current_progress: 5, max_progress: 7, is_unlocked: false, claimed: false, gem_reward: 100 },
-          { id: 2, title: "Sage", description: "Earn 1,000 XP in your course", current_progress: 1000, max_progress: 1000, is_unlocked: true, claimed: true, gem_reward: 150 },
-          { id: 3, title: "Sharpshooter", description: "Complete 5 lessons with 100% accuracy", current_progress: 4, max_progress: 5, is_unlocked: false, claimed: false, gem_reward: 75 },
-          { id: 4, title: "Legend", description: "Unlock 12 skills across all units", current_progress: 12, max_progress: 12, is_unlocked: true, claimed: false, gem_reward: 200 },
-        ]);
-      });
-  }, []);
+    if (!isGuest) {
+      api.getAchievements()
+        .then((res) => setAchievements(res))
+        .catch(() => setAchievements(DEMO_ACHIEVEMENTS_FALLBACK));
+    } else {
+      setAchievements(DEMO_ACHIEVEMENTS_FALLBACK);
+    }
+  }, [isGuest]);
+
+  const DEMO_ACHIEVEMENTS_FALLBACK = DEMO_ACHIEVEMENTS.map((a) => ({
+    id: a.id,
+    title: a.title,
+    description: a.description,
+    current_progress: a.progress,
+    max_progress: a.max_progress,
+    is_unlocked: a.unlocked,
+    claimed: a.unlocked && a.id !== 4,
+    gem_reward: a.reward_gems,
+  }));
 
   const handleClaim = (id: number) => {
+    if (isGuest) {
+      setShowAuthModal(true);
+      return;
+    }
     api.claimAchievement(id)
       .then(() => {
         setAchievements((prev) =>
@@ -35,10 +52,19 @@ export default function AchievementsPage() {
       .catch(() => {});
   };
 
+  const list = achievements.length > 0 ? achievements : DEMO_ACHIEVEMENTS_FALLBACK;
+
   return (
     <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
       <Sidebar />
-      <Navbar />
+      <Navbar user={user} />
+
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        actionText="claim achievement rewards and track progress"
+        returnUrl="/achievements"
+      />
 
       <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-4xl mx-auto p-4 sm:p-6 w-full">
         <div className="mb-8 flex items-center justify-between">
@@ -54,47 +80,47 @@ export default function AchievementsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {achievements.map((ach) => {
+          {list.map((ach) => {
             const pct = Math.round((ach.current_progress / ach.max_progress) * 100);
             return (
               <Card key={ach.id} className="flex flex-col justify-between p-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <div
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-md ${
-                      ach.is_unlocked ? "bg-duo-yellow shadow-duo-yellow" : "bg-gray-200 dark:bg-slate-800 text-gray-400"
-                    }`}
-                  >
-                    {ach.is_unlocked ? <Award className="w-8 h-8" /> : <Lock className="w-6 h-6" />}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-extrabold font-['Fredoka'] text-gray-800 dark:text-slate-100">
+                <div>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black ${
+                      ach.is_unlocked ? "bg-amber-100 text-duo-yellow border-2 border-duo-yellow" : "bg-gray-100 text-gray-400"
+                    }`}>
+                      {ach.is_unlocked ? <Award className="w-8 h-8 text-duo-yellow" /> : <Lock className="w-6 h-6 text-gray-400" />}
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-lg text-gray-800 dark:text-slate-100 font-['Fredoka']">
                         {ach.title}
                       </h3>
-                      <span className="text-xs font-extrabold text-duo-blue">+{ach.gem_reward} Gems</span>
+                      <p className="text-xs font-semibold text-gray-500">{ach.description}</p>
                     </div>
-                    <p className="text-xs text-gray-500 font-semibold mt-1">{ach.description}</p>
+                  </div>
+
+                  <div className="space-y-1 mb-4">
+                    <div className="flex justify-between text-xs font-black text-gray-500">
+                      <span>Progress</span>
+                      <span>{ach.current_progress} / {ach.max_progress}</span>
+                    </div>
+                    <ProgressBar value={pct} max={100} colorHex={ach.is_unlocked ? "#FFC800" : "#E5E7EB"} height="h-3" />
                   </div>
                 </div>
 
-                {/* Progress bar and button */}
-                <div className="space-y-3">
-                  <div className="flex justify-between text-xs font-bold text-gray-400">
-                    <span>Progress</span>
-                    <span>{ach.current_progress} / {ach.max_progress}</span>
-                  </div>
-                  <ProgressBar progress={pct} color={ach.is_unlocked ? "yellow" : "blue"} height="h-3" />
-
-                  {ach.is_unlocked && !ach.claimed && (
-                    <Button variant="yellow" size="full" onClick={() => handleClaim(ach.id)}>
-                      CLAIM {ach.gem_reward} GEMS
-                    </Button>
-                  )}
-
-                  {ach.claimed && (
-                    <div className="py-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-xl text-center font-extrabold text-xs text-emerald-600 flex items-center justify-center gap-1">
-                      <Check className="w-4 h-4" /> CLAIMED
+                <div>
+                  {ach.claimed ? (
+                    <div className="flex items-center justify-center gap-2 text-xs font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-duo-green">
+                      <Check className="w-4 h-4 text-duo-green" /> Claimed (+{ach.gem_reward} Gems)
                     </div>
+                  ) : ach.is_unlocked ? (
+                    <Button variant="green" size="full" onClick={() => handleClaim(ach.id)}>
+                      Claim +{ach.gem_reward} Gems
+                    </Button>
+                  ) : (
+                    <Button variant="white" size="full" disabled>
+                      Locked
+                    </Button>
                   )}
                 </div>
               </Card>

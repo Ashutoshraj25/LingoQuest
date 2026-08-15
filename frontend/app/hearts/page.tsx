@@ -7,13 +7,21 @@ import { Navbar } from "@/components/ui/Navbar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Mascot } from "@/components/ui/Mascot";
-import { Heart, Dumbbell, Gem, Clock } from "lucide-react";
+import { Heart, Dumbbell, Gem } from "lucide-react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 
 export default function HeartsPage() {
-  const [hearts, setHearts] = useState(5);
+  const { user, isGuest } = useAuth();
+  const [hearts, setHearts] = useState(user.hearts || 5);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleRefill = () => {
+    if (isGuest) {
+      setShowAuthModal(true);
+      return;
+    }
     api.refillHearts()
       .then((res) => {
         setHearts(res.hearts);
@@ -28,7 +36,14 @@ export default function HeartsPage() {
   return (
     <div className="h-screen w-screen overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
       <Sidebar />
-      <Navbar user={{ streak: 5, xp: 450, hearts, gems: 1200, avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=Alex" }} />
+      <Navbar user={{ ...user, hearts }} />
+
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        actionText="refill hearts and save progress"
+        returnUrl="/hearts"
+      />
 
       <main className="lg:pl-64 pt-16 h-screen overflow-y-auto no-scrollbar scroll-smooth max-w-2xl mx-auto p-4 sm:p-6 text-center w-full">
         <Mascot mood={hearts === 0 ? "sad" : "happy"} size={140} speechBubble={hearts === 0 ? "Oh no! You're out of hearts!" : "Keep your hearts full so you never stop learning!"} />
@@ -66,21 +81,13 @@ export default function HeartsPage() {
                 <Gem className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="font-extrabold text-base font-['Fredoka']">Refill Full Hearts</h4>
-                <p className="text-xs text-gray-500 font-semibold">Get 5 Hearts for 350 Gems</p>
+                <h4 className="font-extrabold text-base font-['Fredoka']">Refill All Hearts</h4>
+                <p className="text-xs text-gray-500 font-semibold">Instantly restore to 5 Hearts for 150 Gems</p>
               </div>
             </div>
             <Button variant="blue" size="sm" onClick={handleRefill}>
               REFILL
             </Button>
-          </Card>
-
-          {/* Timer Countdown */}
-          <Card className="p-5 bg-gray-50 dark:bg-slate-800 text-center">
-            <div className="flex items-center justify-center gap-2 text-sm font-bold text-gray-500">
-              <Clock className="w-4 h-4 text-duo-orange" />
-              <span>Next automatic heart in 04:55</span>
-            </div>
           </Card>
         </div>
       </main>
