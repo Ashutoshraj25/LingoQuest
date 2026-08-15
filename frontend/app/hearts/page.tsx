@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Sidebar } from "@/components/ui/Sidebar";
 import { Navbar } from "@/components/ui/Navbar";
@@ -13,22 +13,37 @@ import { useAuth } from "@/context/AuthContext";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 
 export default function HeartsPage() {
-  const { user, isGuest } = useAuth();
+  const { user, isGuest, updateUserSession } = useAuth();
   const [hearts, setHearts] = useState(user.hearts || 5);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  useEffect(() => {
+    setHearts(user.hearts || 5);
+  }, [user.hearts]);
+
   const handleRefill = () => {
-    if (isGuest) {
-      setShowAuthModal(true);
+    if ((user.gems || 0) < 150) {
+      alert("Not enough gems! Practice lessons to earn gems.");
       return;
     }
+
+    if (isGuest) {
+      const newGems = Math.max(0, (user.gems || 650) - 150);
+      setHearts(5);
+      updateUserSession({ hearts: 5, gems: newGems });
+      alert("Hearts fully refilled!");
+      return;
+    }
+
     api.refillHearts()
       .then((res) => {
         setHearts(res.hearts);
+        updateUserSession({ hearts: res.hearts });
         alert("Hearts fully refilled!");
       })
       .catch(() => {
         setHearts(5);
+        updateUserSession({ hearts: 5 });
         alert("Hearts fully refilled!");
       });
   };
@@ -41,6 +56,7 @@ export default function HeartsPage() {
       <AuthPromptModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
+        title="Create a free account to save your progress forever"
         actionText="refill hearts and save progress"
         returnUrl="/hearts"
       />

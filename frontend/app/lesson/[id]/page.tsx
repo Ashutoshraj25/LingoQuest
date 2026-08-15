@@ -13,19 +13,20 @@ import { SpeakingExercise } from "@/features/lesson-player/SpeakingExercise";
 import { FeedbackBar } from "@/features/lesson-player/FeedbackBar";
 import { LessonIntroModal } from "@/features/lesson-player/LessonIntroModal";
 import { LessonCompleteView } from "@/features/lesson-complete/LessonCompleteView";
-import { Mascot } from "@/components/ui/Mascot";
-import { Volume2 } from "lucide-react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 
 export default function LessonPlayerPage() {
   const params = useParams();
   const router = useRouter();
+  const { user, isGuest, updateUserSession } = useAuth();
   const lessonId = Number(params?.id) || 1;
 
   const [lesson, setLesson] = useState<any>(null);
   const [showIntro, setShowIntro] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [hearts, setHearts] = useState(5);
+  const [hearts, setHearts] = useState(user.hearts || 5);
 
   const [userAnswer, setUserAnswer] = useState<any>(null);
   const [selectedWordBank, setSelectedWordBank] = useState<string[]>([]);
@@ -33,6 +34,7 @@ export default function LessonPlayerPage() {
   const [correctAnswer, setCorrectAnswer] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
   const [isFinished, setIsFinished] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     api.getLesson(lessonId)
@@ -118,7 +120,9 @@ export default function LessonPlayerPage() {
         } else {
           setFeedbackStatus("incorrect");
           setCorrectAnswer(res.correct_answer);
-          setHearts(res.hearts_remaining);
+          const newHearts = Math.max(0, res.hearts_remaining);
+          setHearts(newHearts);
+          updateUserSession({ hearts: newHearts });
         }
       })
       .catch(() => {
@@ -134,24 +138,49 @@ export default function LessonPlayerPage() {
     if (currentIndex + 1 < totalExercises) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      api.completeLesson({
-        lesson_id: lessonId,
-        accuracy: 98.0,
-        combo_max: 8,
-        time_taken_seconds: 120,
-      }).catch(() => {});
+      const earnedXP = lesson.xp_reward || 25;
+      updateUserSession({
+        xp: (user.xp || 2350) + earnedXP,
+        completed_lessons: (user.completed_lessons || 42) + 1,
+      });
+
+      if (!isGuest) {
+        api.completeLesson({
+          lesson_id: lessonId,
+          accuracy: 98.0,
+          combo_max: 8,
+          time_taken_seconds: 120,
+        }).catch(() => {});
+      }
       setIsFinished(true);
+    }
+  };
+
+  const handleFinishContinue = () => {
+    if (isGuest) {
+      setShowAuthModal(true);
+    } else {
+      router.push("/");
     }
   };
 
   if (isFinished) {
     return (
-      <LessonCompleteView
-        xpEarned={lesson.xp_reward}
-        accuracy={98}
-        comboMax={8}
-        onContinue={() => router.push("/")}
-      />
+      <>
+        <AuthPromptModal
+          isOpen={showAuthModal}
+          onClose={() => router.push("/")}
+          title="Create a free account to save your progress forever"
+          actionText="save your XP and streak forever"
+          returnUrl="/"
+        />
+        <LessonCompleteView
+          xpEarned={lesson.xp_reward || 25}
+          accuracy={98}
+          comboMax={8}
+          onContinue={handleFinishContinue}
+        />
+      </>
     );
   }
 
@@ -181,20 +210,6 @@ export default function LessonPlayerPage() {
           {currentExercise.prompt}
         </h2>
 
-        {/* Mascot & Sentence Bubble */}
-        <div className="flex items-center justify-center gap-4 my-6">
-          <Mascot mood="happy" size={90} />
-          <div className="p-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-2xl shadow-sm text-left relative flex items-center gap-3">
-            <button className="p-2 rounded-xl bg-sky-100 text-duo-blue hover:scale-105 transition-all">
-              <Volume2 className="w-6 h-6" />
-            </button>
-            <span className="text-xl font-extrabold text-gray-800 dark:text-slate-100">
-              {currentExercise.question_text}
-            </span>
-          </div>
-        </div>
-
-        {/* Dynamic Exercise Input Views */}
         {currentExercise.type === "multiple_choice" && (
           <MultipleChoice
             options={currentExercise.options}

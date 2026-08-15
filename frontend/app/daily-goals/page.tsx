@@ -6,14 +6,14 @@ import { Navbar } from "@/components/ui/Navbar";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { Target, Check, Gem, Zap } from "lucide-react";
+import { Target, Check } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { DEMO_DAILY_GOALS } from "@/lib/demoData";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 
 export default function DailyGoalsPage() {
-  const { user, isGuest } = useAuth();
+  const { user, isGuest, updateUserSession } = useAuth();
   const [data, setData] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -46,17 +46,29 @@ export default function DailyGoalsPage() {
   const activeData = data || FALLBACK_GOALS;
   const quests = activeData.quests || [];
 
-  const handleClaim = (id: number) => {
+  const handleClaim = (id: number, gemsReward: number = 25, xpReward: number = 30) => {
     if (isGuest) {
-      setShowAuthModal(true);
+      setData((prev: any) => ({
+        ...prev,
+        quests: prev.quests.map((q: any) => (q.id === id ? { ...q, claimed: true } : q)),
+      }));
+      updateUserSession({
+        gems: (user.gems || 650) + gemsReward,
+        xp: (user.xp || 2350) + xpReward,
+      });
+      alert(`Claimed +${gemsReward} Gems!`);
       return;
     }
+
     api.claimQuest(id)
       .then(() => {
         setData((prev: any) => ({
           ...prev,
           quests: prev.quests.map((q: any) => (q.id === id ? { ...q, claimed: true } : q)),
         }));
+        updateUserSession({
+          gems: (user.gems || 650) + gemsReward,
+        });
       })
       .catch(() => {});
   };
@@ -69,6 +81,7 @@ export default function DailyGoalsPage() {
       <AuthPromptModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
+        title="Create a free account to save your progress forever"
         actionText="claim daily quest rewards and save streak progress"
         returnUrl="/daily-goals"
       />
@@ -127,7 +140,7 @@ export default function DailyGoalsPage() {
                       <Check className="w-4 h-4 text-duo-green" /> Claimed
                     </div>
                   ) : quest.completed ? (
-                    <Button variant="green" size="sm" onClick={() => handleClaim(quest.id)} className="w-full">
+                    <Button variant="green" size="sm" onClick={() => handleClaim(quest.id, quest.reward_gems, quest.reward_xp)} className="w-full">
                       Claim +{quest.reward_gems} Gems
                     </Button>
                   ) : (

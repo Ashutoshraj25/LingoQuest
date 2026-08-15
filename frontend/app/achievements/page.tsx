@@ -13,7 +13,7 @@ import { DEMO_ACHIEVEMENTS } from "@/lib/demoData";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 
 export default function AchievementsPage() {
-  const { user, isGuest } = useAuth();
+  const { user, isGuest, updateUserSession } = useAuth();
   const [achievements, setAchievements] = useState<any[]>([]);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -38,9 +38,13 @@ export default function AchievementsPage() {
     gem_reward: a.reward_gems,
   }));
 
-  const handleClaim = (id: number) => {
+  const handleClaim = (id: number, gemReward: number = 50) => {
     if (isGuest) {
-      setShowAuthModal(true);
+      setAchievements((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, claimed: true } : a))
+      );
+      updateUserSession({ gems: (user.gems || 650) + gemReward });
+      alert(`Claimed +${gemReward} Gems!`);
       return;
     }
     api.claimAchievement(id)
@@ -48,6 +52,7 @@ export default function AchievementsPage() {
         setAchievements((prev) =>
           prev.map((a) => (a.id === id ? { ...a, claimed: true } : a))
         );
+        updateUserSession({ gems: (user.gems || 650) + gemReward });
       })
       .catch(() => {});
   };
@@ -62,6 +67,7 @@ export default function AchievementsPage() {
       <AuthPromptModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
+        title="Create a free account to save your progress forever"
         actionText="claim achievement rewards and track progress"
         returnUrl="/achievements"
       />
@@ -114,7 +120,7 @@ export default function AchievementsPage() {
                       <Check className="w-4 h-4 text-duo-green" /> Claimed (+{ach.gem_reward} Gems)
                     </div>
                   ) : ach.is_unlocked ? (
-                    <Button variant="green" size="full" onClick={() => handleClaim(ach.id)}>
+                    <Button variant="green" size="full" onClick={() => handleClaim(ach.id, ach.gem_reward)}>
                       Claim +{ach.gem_reward} Gems
                     </Button>
                   ) : (

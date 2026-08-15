@@ -11,7 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 
 export default function ShopPage() {
-  const { user, isGuest } = useAuth();
+  const { user, isGuest, updateUserSession } = useAuth();
   const [items, setItems] = useState<any[]>([]);
   const [userGems, setUserGems] = useState(user.gems || 650);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -37,22 +37,38 @@ export default function ShopPage() {
     { id: 4, key: "super_membership", name: "LingoQuest Plus", description: "Unlimited Hearts, Zero Ads, and Special Badges.", price_gems: 1000, icon_name: "crown" },
   ];
 
-  const handlePurchase = (id: number, price: number) => {
+  const handlePurchase = (id: number, price: number, key?: string) => {
+    if (userGems < price) {
+      alert("Not enough gems! Complete lessons to earn more gems.");
+      return;
+    }
+
     if (isGuest) {
-      setShowAuthModal(true);
+      if (key === "super_membership") {
+        setShowAuthModal(true);
+        return;
+      }
+      const newGems = Math.max(0, userGems - price);
+      const updates: any = { gems: newGems };
+      if (key === "heart_refill") {
+        updates.hearts = 5;
+      }
+      setUserGems(newGems);
+      updateUserSession(updates);
+      alert("Item purchased in Guest mode!");
       return;
     }
-    if (userGems < price && price > 0) {
-      alert("Not enough gems!");
-      return;
-    }
+
     api.purchaseItem(id)
       .then((res) => {
         setUserGems(res.new_gems);
+        updateUserSession({ gems: res.new_gems });
         alert(res.message);
       })
       .catch(() => {
-        setUserGems((prev) => Math.max(0, prev - price));
+        const newGems = Math.max(0, userGems - price);
+        setUserGems(newGems);
+        updateUserSession({ gems: newGems });
         alert("Item purchased!");
       });
   };
@@ -67,7 +83,8 @@ export default function ShopPage() {
       <AuthPromptModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
-        actionText="purchase items and save gems"
+        title="Create a free account to save your progress forever"
+        actionText="purchase premium items and save gems"
         returnUrl="/shop"
       />
 
@@ -90,7 +107,7 @@ export default function ShopPage() {
           </div>
           <Button
             variant="white"
-            onClick={() => handlePurchase(4, 1000)}
+            onClick={() => handlePurchase(4, 1000, "super_membership")}
             className="text-amber-600 font-extrabold uppercase py-3 px-6"
           >
             Upgrade (1,000 <Gem className="w-4 h-4 ml-1 inline text-duo-blue fill-duo-blue" />)
@@ -117,7 +134,7 @@ export default function ShopPage() {
               <Button
                 variant="blue"
                 size="full"
-                onClick={() => handlePurchase(item.id, item.price_gems)}
+                onClick={() => handlePurchase(item.id, item.price_gems, item.key)}
                 className="flex items-center justify-center gap-2"
               >
                 <span>GET FOR</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { DEMO_USER, UserProfile } from "@/lib/demoData";
 
@@ -23,12 +23,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [realUser, setRealUser] = useState<UserProfile | null>(null);
+  const [guestUser, setGuestUser] = useState<UserProfile>(DEMO_USER);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    // Instant local cache resolution (<10ms)
+    // 1. Initialize Guest User from localStorage if available
+    const storedGuest = localStorage.getItem("lingoquest_guest_user");
+    if (storedGuest) {
+      try {
+        setGuestUser({ ...DEMO_USER, ...JSON.parse(storedGuest) });
+      } catch (e) {
+        console.error("Error reading stored guest user:", e);
+      }
+    }
+
+    // 2. Resolve Authenticated User session from localStorage token
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
 
@@ -47,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Silent Render server warm-up (non-blocking)
     api.pingHealth();
 
-    // Non-blocking background profile synchronization
+    // Background profile synchronization if token exists
     if (storedToken) {
       api.getUserProfile()
         .then((profile) => {
@@ -103,19 +113,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const guestLogin = async () => {
-    const res = await api.guestLogin();
-    saveAuthSession(res);
+    // Keeps user in Guest mode
     router.push("/");
   };
 
   const updateUserSession = (updated: Partial<UserProfile>) => {
-    setRealUser((prev) => {
-      const next = { ...(prev || DEMO_USER), ...updated } as UserProfile;
-      if (prev) {
+    if (realUser) {
+      setRealUser((prev) => {
+        const next = { ...(prev || DEMO_USER), ...updated } as UserProfile;
         localStorage.setItem("user", JSON.stringify(next));
-      }
-      return next;
-    });
+        return next;
+      });
+    } else {
+      setGuestUser((prev) => {
+        const next = { ...(prev || DEMO_USER), ...updated } as UserProfile;
+        localStorage.setItem("lingoquest_guest_user", JSON.stringify(next));
+        return next;
+      });
+    }
   };
 
   const logout = () => {
@@ -124,13 +139,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("user");
     document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     setRealUser(null);
-
     api.logout().catch(() => {});
-
-    // Stay on current page, switch seamlessly to DEMO_USER
   };
 
-  const activeUser = realUser || DEMO_USER;
+  const activeUser = realUser || guestUser;
   const isAuthenticated = Boolean(realUser);
   const isGuest = !isAuthenticated;
 

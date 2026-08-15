@@ -193,99 +193,113 @@ export const Navbar: React.FC<NavbarProps> = ({ user: propUser, onLanguageChange
           </div>
         </div>
 
-        {/* Right Section: Gamification Counters or Auth CTAs */}
+        {/* Right Section: Gamification Counters and Auth CTAs */}
         <div className="flex items-center gap-2 sm:gap-4 font-extrabold text-sm sm:text-base">
-          {isAuthenticated ? (
-            <>
-              {/* Streak */}
-              <Link href="/daily-goals" className="flex items-center gap-1 sm:gap-1.5 text-duo-orange hover:opacity-80 transition-all min-h-[44px] px-1">
-                <Flame className="w-5 h-5 sm:w-6 sm:h-6 fill-duo-orange text-duo-orange animate-bounce" />
-                <span>{streakValue}</span>
-              </Link>
+          {/* Streak */}
+          <Link href="/daily-goals" className="flex items-center gap-1 sm:gap-1.5 text-duo-orange hover:opacity-80 transition-all min-h-[44px] px-1">
+            <Flame className="w-5 h-5 sm:w-6 sm:h-6 fill-duo-orange text-duo-orange animate-bounce" />
+            <span>{streakValue}</span>
+          </Link>
 
-              {/* Gems */}
-              <Link href="/shop" className="flex items-center gap-1 sm:gap-1.5 text-duo-blue hover:opacity-80 transition-all min-h-[44px] px-1">
-                <Gem className="w-5 h-5 sm:w-6 sm:h-6 fill-duo-blue text-duo-blue" />
-                <span>{user.gems || 450}</span>
-              </Link>
+          {/* Gems */}
+          <Link href="/shop" className="flex items-center gap-1 sm:gap-1.5 text-duo-blue hover:opacity-80 transition-all min-h-[44px] px-1">
+            <Gem className="w-5 h-5 sm:w-6 sm:h-6 fill-duo-blue text-duo-blue" />
+            <span>{user.gems || 650}</span>
+          </Link>
 
-              {/* Hearts */}
-              <Link href="/hearts" className="flex items-center gap-1 sm:gap-1.5 text-duo-red hover:opacity-80 transition-all min-h-[44px] px-1">
-                <Heart className="w-5 h-5 sm:w-6 sm:h-6 fill-duo-red text-duo-red" />
-                <span>{user.hearts || 5}</span>
-              </Link>
+          {/* Hearts */}
+          <Link href="/hearts" className="flex items-center gap-1 sm:gap-1.5 text-duo-red hover:opacity-80 transition-all min-h-[44px] px-1">
+            <Heart className="w-5 h-5 sm:w-6 sm:h-6 fill-duo-red text-duo-red" />
+            <span>{user.hearts || 5}</span>
+          </Link>
 
-              {/* Profile Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-duo-green overflow-hidden hover:scale-105 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-duo-green"
-                  aria-label="User Profile Options"
+          {/* Profile Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-duo-green overflow-hidden hover:scale-105 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-duo-green"
+              aria-label="User Profile Options"
+            >
+              <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
+            </button>
+
+            {profileDropdownOpen && (
+              <div className="absolute top-12 right-0 w-56 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-2xl shadow-xl p-2 z-50 space-y-1">
+                <div className="px-3 py-2 border-b border-gray-100 dark:border-slate-700">
+                  <p className="font-extrabold text-sm text-gray-800 dark:text-slate-100 truncate">{user.full_name}</p>
+                  <p className="text-xs font-semibold text-gray-400 truncate">@{user.username}</p>
+                  {!isAuthenticated && (
+                    <span className="inline-block mt-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-950/60 text-amber-600 font-extrabold text-[10px] rounded-md uppercase">
+                      Guest Demo Mode
+                    </span>
+                  )}
+                </div>
+
+                <Link
+                  href="/profile"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
                 >
-                  <img src={user.avatar_url} alt={user.full_name} className="w-full h-full object-cover" />
-                </button>
+                  <User className="w-4 h-4 text-duo-blue" /> Profile
+                </Link>
 
-                {profileDropdownOpen && (
-                  <div className="absolute top-12 right-0 w-52 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-2xl shadow-xl p-2 z-50 space-y-1">
-                    <div className="px-3 py-2 border-b border-gray-100 dark:border-slate-700">
-                      <p className="font-extrabold text-sm text-gray-800 dark:text-slate-100 truncate">{user.full_name}</p>
-                      <p className="text-xs font-semibold text-gray-400 truncate">@{user.username}</p>
-                    </div>
+                <Link
+                  href="/settings"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <Settings className="w-4 h-4 text-gray-500" /> Settings
+                </Link>
 
-                    <Link
-                      href="/profile"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-                    >
-                      <User className="w-4 h-4 text-duo-blue" /> Profile
-                    </Link>
+                <Link
+                  href="/statistics"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <BarChart2 className="w-4 h-4 text-duo-purple" /> Statistics
+                </Link>
 
-                    <Link
-                      href="/settings"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-                    >
-                      <Settings className="w-4 h-4 text-gray-500" /> Settings
-                    </Link>
+                <Link
+                  href="/achievements"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <Trophy className="w-4 h-4 text-duo-yellow" /> Achievements
+                </Link>
 
-                    <Link
-                      href="/statistics"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-                    >
-                      <BarChart2 className="w-4 h-4 text-duo-purple" /> Statistics
-                    </Link>
-
-                    <Link
-                      href="/achievements"
-                      onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-                    >
-                      <Trophy className="w-4 h-4 text-duo-yellow" /> Achievements
-                    </Link>
-
-                    <button
-                      onClick={() => {
-                        setProfileDropdownOpen(false);
-                        logout();
-                      }}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors text-left"
-                    >
-                      <LogOut className="w-4 h-4 text-rose-500" /> Logout
-                    </button>
-                  </div>
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors text-left"
+                  >
+                    <LogOut className="w-4 h-4 text-rose-500" /> Logout
+                  </button>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-duo-green hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors"
+                  >
+                    <User className="w-4 h-4 text-duo-green" /> Sign In to Save
+                  </Link>
                 )}
               </div>
-            </>
-          ) : (
+            )}
+          </div>
+
+          {/* Log In & Create Account CTAs for Guest Users */}
+          {!isAuthenticated && (
             <div className="flex items-center gap-2">
               <Link href="/auth/login">
-                <button className="px-3.5 py-2 rounded-xl border-2 border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-extrabold uppercase tracking-wide text-gray-700 dark:text-slate-200 transition-all">
+                <button className="px-3 sm:px-3.5 py-2 rounded-xl border-2 border-gray-200 dark:border-slate-700 hover:bg-gray-100 dark:hover:bg-slate-800 text-xs font-extrabold uppercase tracking-wide text-gray-700 dark:text-slate-200 transition-all">
                   Log In
                 </button>
               </Link>
               <Link href="/auth/register">
-                <button className="px-4 py-2 rounded-xl bg-duo-green text-white hover:bg-emerald-600 font-extrabold text-xs uppercase tracking-wide shadow-duo-green transition-all">
+                <button className="hidden sm:inline-block px-4 py-2 rounded-xl bg-duo-green text-white hover:bg-emerald-600 font-extrabold text-xs uppercase tracking-wide shadow-duo-green transition-all">
                   Create Account
                 </button>
               </Link>
